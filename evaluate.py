@@ -99,7 +99,7 @@ class Eval:
 
     def eval(self, chromosome, **kwargs):
         if isinstance(chromosome, Graph) :
-            raise NotImplementedError("não sabe avaliar um grafo ainda")
+            return evaluate_treegraph(chromosome, self.penality)
         else:
             return evaluate_binary(chromosome,
                                    self.STPG.graph,
