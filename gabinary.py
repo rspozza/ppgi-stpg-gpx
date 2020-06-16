@@ -13,13 +13,7 @@ from base.selector import roullete
 from evaluate import Eval
 from graph import Graph
 from graph.reader import ReaderORLibrary
-from util import read_problem
-
-
-def display(population):
-    size = len(population)
-    msg = f"Population {population.id} | size {size} | generation {population.generation}"
-    print(msg)
+from util import read_problem, display
 
 def simulation(STPG, trial=0, output=None):
 
@@ -46,13 +40,36 @@ def simulation(STPG, trial=0, output=None):
 
     return result
 
+def test_forloop(STPG, trial=0, output=None):
+    print("INIT EVOLUTION")
+
+    population_size = 100
+    lenght = STPG.nro_nodes - STPG.nro_terminals
+
+    population = (Population(chromosomes=[random_binary(lenght) for _ in range(population_size)],
+                            eval_function=Eval(STPG),
+                            maximize=True)
+                        .evaluate()
+                        .callback(normalize))
+
+    for _ in range(1000):
+        population = (
+            population
+            .select(selection_func=roullete)
+            .crossover(combiner=crossover_2points)
+            .mutate(mutate_function=flip_onebit, probability=0.2)
+            .evaluate()
+            .callback(normalize))
+
+    return population
+
 def run_multitrials(filename, max_trial):
 
     STPG = read_problem("datasets", "ORLibrary", "steinb13.txt")
     for trial in range(max_trial):
-        pop = simulation(STPG, trial=trial)
+        simulation(STPG, trial=trial)
 
 if __name__ == "__main__":
     STPG = read_problem("datasets", "ORLibrary", "steinb13.txt")
 
-    pop = simulation(STPG)
+    # pop = simulation(STPG)

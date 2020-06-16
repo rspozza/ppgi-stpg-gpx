@@ -184,14 +184,14 @@ class SteinerPopulation(BasePopulation):
             Arguments are only passed to the functions if they accept them.
         :return: self
         """
-        raise RuntimeWarning("offspring_generator instanciate with a Individual not a SteinerIndividual")
-        if population_size:
-            self.intended_size = population_size
-        offspring = offspring_generator(parents=self.individuals,
-                                        parent_picker=select_arguments(parent_picker),
-                                        combiner=select_arguments(combiner),
-                                        **kwargs)
-        self.individuals += list(islice(offspring, self.intended_size - len(self.individuals)))
+        # raise RuntimeWarning("offspring_generator instanciate with a Individual not a SteinerIndividual")
+        # if population_size:
+        #     self.intended_size = population_size
+        # offspring = offspring_generator(parents=self.individuals,
+        #                                 parent_picker=select_arguments(parent_picker),
+        #                                 combiner=select_arguments(combiner),
+        #                                 **kwargs)
+        # self.individuals += list(islice(offspring, self.intended_size - len(self.individuals)))
         ####  self.generation += 1 ## generation should be counted here
         return self
 

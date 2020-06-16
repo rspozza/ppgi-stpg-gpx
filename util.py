@@ -11,3 +11,8 @@ def read_problem(*filepath):
     STPG.graph = Graph(edges=STPG.graph)
 
     return STPG
+
+def display(population):
+    size = len(population)
+    msg = f"Population {population.id} | size {size} | generation {population.generation}"
+    print(msg)
