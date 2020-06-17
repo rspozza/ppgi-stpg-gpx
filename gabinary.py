@@ -2,18 +2,18 @@
 import time
 from os import path
 
-from base.customevol import SteinerEvolution as Evolution
-from base.customevol import SteinerPopulation as Population
-
 from base.chromosome import random_binary
 from base.combiner import crossover_2points
+from base.customevol import SteinerEvolution as Evolution
+from base.customevol import SteinerPopulation as Population
 from base.mutate import flip_onebit
 from base.normalization import normalize
 from base.selector import roullete
-from evaluate import Eval
 from graph import Graph
 from graph.reader import ReaderORLibrary
-from util import read_problem, display
+from treetools import Eval
+from util import display, read_problem
+
 
 def simulation(STPG, trial=0, output=None):
 
