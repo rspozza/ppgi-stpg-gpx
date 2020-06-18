@@ -9,27 +9,25 @@ from graph.priorityqueue import PriorityQueue
 
 def vertices_from_binary_chromosome(chromosome, terminals, nro_vertices):
 
-    terminals = set(terminals)
+    non_terminals = (v for v in range(1, nro_vertices+1) if v not in terminals)
 
-    def is_terminal(v):
-        return v in terminals
-
-    non_terminals = filterfalse(is_terminal, range(1, nro_vertices+1))
-    genes = (int(g) for g in chromosome)
-    vertices = set(compress(non_terminals, genes)).union(terminals)
+    vertices = set(v for v, g in zip(non_terminals, chromosome) if int(g)).union(terminals)
 
     return vertices
 
 
-def evaluate_binary(chromosome, GRAPH, terminals, nro_vertices, penality):
+def evaluate_binary(chromosome, STPG : SteinerTreeProblem, penality):
+
+    GRAPH = STPG.graph
+    terminals = STPG.terminals
+    nro_vertices = STPG.nro
+
+    ## identifica todos os vértices da solução candidata (terminais e não terminais)
+    vertices = vertices_from_binary_chromosome(chromosome, terminals, nro_vertices)
 
     # instânciando variáveis e funções auxiliares
     queue = PriorityQueue()
-    DS = DisjointSets()
     dones = set()
-
-    ## identifica todos os vértices não terminais representados no cromossomo
-    vertices = vertices_from_binary_chromosome(chromosome, terminals, nro_vertices)
 
     # adiciona uma aresta se os vértices extremos da aresta
     # estão contidos no conjunto vertices
@@ -44,6 +42,7 @@ def evaluate_binary(chromosome, GRAPH, terminals, nro_vertices, penality):
                 queue.push(weight, (v, u, weight))
 
     ## Monta a MST baseado no algoritmo de Kruskal
+    DS = DisjointSets()
     for v in vertices:
         DS.make_set(v)
 
@@ -56,6 +55,8 @@ def evaluate_binary(chromosome, GRAPH, terminals, nro_vertices, penality):
         # Repare que não construimos a MST mas apenas
         # definimos os conjuntos disjuntos.
 
+    # a quantidade de partições se refere a
+    # quantidade de parents distintos temos no conjunto disjunto.
     qtd_partition = len(DS.get_disjoint_sets())
 
     total_cost += penality(qtd_partition)
@@ -63,7 +64,9 @@ def evaluate_binary(chromosome, GRAPH, terminals, nro_vertices, penality):
     return total_cost, qtd_partition
 
 
-def evaluate_treegraph(chromosome, penality):
+def evaluate_treegraph(chromosome, STPG : SteinerTreeProblem, penality):
+
+        GRAPH = STPG.graph
 
         total_cost = 0
         qtd_partition = 0
@@ -77,7 +80,7 @@ def evaluate_treegraph(chromosome, penality):
             if DS.find(v) == DS.find(u):
                 print("FOI IDENTIFICADO UM CICLO EM UMA DAS SOLUÇÕES")
             DS.union(v,u)
-            total_cost +=  chromosome.weight(v, u)
+            total_cost +=  GRAPH.weight(v, u)
 
         qtd_partition = len(DS.get_disjoint_sets())
 
@@ -99,13 +102,11 @@ class Eval:
 
     def eval(self, chromosome, **kwargs):
         if isinstance(chromosome, Graph) :
-            return evaluate_treegraph(chromosome, self.penality)
+            return evaluate_treegraph(chromosome, self.STPG, self.penality)
+        elif isinstance(chromosome, (str, list, tuple)):
+            return evaluate_binary(chromosome, self.STPG, self.penality)
         else:
-            return evaluate_binary(chromosome,
-                                   self.STPG.graph,
-                                   self.STPG.terminals,
-                                   self.STPG.nro_nodes,
-                                   self.penality)
+            raise TypeError(f"Chromosome type could not be handled {type(chromosome)}")
 
 
 class Converter:
@@ -122,7 +123,8 @@ class Converter:
 
         genes = ['0'] * nro_vertices # all vertices in the instance problem
 
-        # vertices in the subgraph (partial solution) include terminals and non-terminals
+        # vertices in the subgraph (partial solution)
+        # include terminals and non-terminals
         for v in subgraph.vertices:
             genes[v-1] = '1'
 
@@ -145,7 +147,7 @@ class Converter:
         dones = set()
 
         # todos os vértices esperados na solução parcial
-        vertices = vertices = vertices_from_binary_chromosome(chromosome, terminals, nro_vertices)
+        vertices = vertices_from_binary_chromosome(chromosome, terminals, nro_vertices)
 
         # adiciona uma aresta se os vértices extremos da aresta
         # estão contidos no conjunto vertices
