@@ -4,7 +4,7 @@ from collections import deque
 from os import path
 
 from graph.graph import Graph
-from graph.reader import Reader
+from graph.reader import ReaderORLibrary
 from graph.steiner import (prunning_mst, shortest_path,
                            shortest_path_origin_prim,
                            shortest_path_with_origin)
@@ -13,11 +13,11 @@ from graph.steiner import (prunning_mst, shortest_path,
 class TestSTPGHeuristicas(unittest.TestCase):
 
     def setUp(self):
-        reader = Reader()
-        self.stpg_instance = reader.parser(path.join("datasets", "osti", "b13.stp"))
+        reader = ReaderORLibrary()
+        self.stpg_instance = reader.parser(path.join("datasets", "ORLibrary", "steinb13.txt"))
 
-        self.graph = Graph(vertices = self.stpg_instance.nro_nodes,
-                            edges=self.stpg_instance.graph)
+        self.graph = self.stpg_instance.graph
+        self.terminals = list(self.stpg_instance.terminals)
 
         random.seed()
 
@@ -31,13 +31,13 @@ class TestSTPGHeuristicas(unittest.TestCase):
         self.assertEqual(stpg.nro_terminals, 17)
 
         self.assertEqual(stpg.nro_terminals, len(stpg.terminals))
-        self.assertEqual(stpg.nro_nodes, len(stpg.graph))
+        self.assertEqual(stpg.nro_nodes, len(stpg.graph.vertices))
 
     def test_shortest_path(self):
         graph = self.graph
         stpg = self.stpg_instance
 
-        terminal = random.choice(stpg.terminals)
+        terminal = random.choice(self.terminals)
         gg, cost = shortest_path(graph, terminal, stpg.terminals)
 
         self.common_cases(gg, cost)
@@ -47,7 +47,7 @@ class TestSTPGHeuristicas(unittest.TestCase):
         graph = self.graph
         stpg = self.stpg_instance
 
-        terminal = random.choice(stpg.terminals)
+        terminal = random.choice(self.terminals)
         gg, cost = shortest_path_with_origin(graph, terminal, stpg.terminals)
 
         self.common_cases(gg, cost)
@@ -57,7 +57,7 @@ class TestSTPGHeuristicas(unittest.TestCase):
         graph = self.graph
         stpg = self.stpg_instance
 
-        terminal = random.choice(stpg.terminals)
+        terminal = random.choice(self.terminals)
         gg, cost = shortest_path_origin_prim(graph, terminal, stpg.terminals)
 
         self.common_cases(gg, cost)
@@ -67,7 +67,7 @@ class TestSTPGHeuristicas(unittest.TestCase):
         graph = self.graph
         stpg = self.stpg_instance
 
-        terminal = random.choice(stpg.terminals)
+        terminal = random.choice(self.terminals)
         gg, cost = prunning_mst(graph, terminal, stpg.terminals)
 
         self.common_cases(gg, cost)
@@ -79,7 +79,7 @@ class TestSTPGHeuristicas(unittest.TestCase):
         self.assertIsInstance(cost, int)
         self.assertGreater(cost,0)
 
-        terminals = set(self.stpg_instance.terminals)
+        terminals = self.stpg_instance.terminals
 
         ## Se o vértice possui grau 1 então é terminal. Mas se for terminal possui grau 1?
         degrees = { k : len(steiner_tree[k]) for k in steiner_tree.edges.keys() }
@@ -102,7 +102,7 @@ class TestSTPGHeuristicas(unittest.TestCase):
         self.assertTrue(ss)
 
         stpg = self.stpg_instance
-        has_cycles = self.check_cycles_dfs(steiner_tree, stpg.terminals[8])
+        has_cycles = self.check_cycles_dfs(steiner_tree, self.terminals[8])
         self.assertFalse(has_cycles)
 
 

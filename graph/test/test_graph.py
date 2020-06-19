@@ -4,7 +4,7 @@ from os import path
 
 from graph import Graph
 from graph.graph import _VerticeView
-from graph import Reader
+from graph import ReaderORLibrary
 
 
 class TestGraphDictionaryDataStructure(unittest.TestCase):
@@ -185,15 +185,15 @@ class TestGraphDictionaryDataStructure(unittest.TestCase):
         self.assertFalse(graph.has_edge(5,5))
 
     def test_GenerateUndirectEdges(self):
-        diretorio_dados = path.join("datasets", "osti")
-        arquivo_dados = "b01.stp"
+        diretorio_dados = path.join("datasets", "ORLibrary")
+        arquivo_dados = "steinb1.txt"
         arquivo = path.join(diretorio_dados, arquivo_dados)
 
-        reader = Reader()
+        reader = ReaderORLibrary()
 
         stp = reader.parser(arquivo)
 
-        graph = Graph(vertices=stp.nro_nodes,edges=stp.graph)
+        graph = stp.graph
 
         edges = set()
 
@@ -203,11 +203,11 @@ class TestGraphDictionaryDataStructure(unittest.TestCase):
         self.assertEqual(len(edges),stp.nro_edges)
 
     def test_read_b01(self):
-        diretorio_dados = path.join("datasets", "osti")
-        arquivo_dados = "b01.stp"
+        diretorio_dados = path.join("datasets", "ORLibrary")
+        arquivo_dados = "steinb1.txt"
         arquivo = path.join(diretorio_dados, arquivo_dados)
 
-        reader = Reader()
+        reader = ReaderORLibrary()
 
         stp = reader.parser(arquivo)
         terminais = [48, 49, 22, 35, 27, 12, 37, 34, 24]
@@ -226,15 +226,15 @@ class TestGraphDictionaryDataStructure(unittest.TestCase):
         self.assertIsInstance(stp.nro_nodes,int)
         self.assertIsInstance(stp.nro_edges,int)
         self.assertIsInstance(stp.nro_terminals,int)
-        self.assertIsInstance(stp.terminals,list)
-        self.assertIsInstance(stp.graph,defaultdict)
+        self.assertIsInstance(stp.terminals,set)
+        self.assertIsInstance(stp.graph,Graph)
 
-        self.assertEqual(len(stp.graph.keys()), stp.nro_nodes)
+        self.assertEqual(len(stp.graph.vertices), stp.nro_nodes)
 
-        self.assertEqual(stp.name,'B01')
+        self.assertEqual(stp.name,'B1')
         self.assertEqual(stp.remark,'Sparse graph with random weights')
         self.assertEqual(stp.creator,'J. E. Beasley')
-        self.assertEqual(stp.file_name,arquivo)
+        self.assertEqual(stp.file_name, arquivo_dados)
 
 if __name__ == "__main__":
     unittest.main()
