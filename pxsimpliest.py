@@ -1,6 +1,8 @@
 from collections import deque
 from graph import Graph, SteinerTreeProblem
 
+from util import record_parents
+
 class SimpliestPX:
     '''
     Operação de Cruzamento baseado em avaliação das partições.
@@ -14,11 +16,13 @@ class SimpliestPX:
     '''
 
     def __init__(self, STPG : SteinerTreeProblem):
+        self.STPG = STPG
         self.GRAPH = STPG.graph
 
     def __call__(self, subtree_a : Graph, subtree_b : Graph):
         return self.operator(subtree_a, subtree_b)
 
+    @record_parents
     def operator(self, subtree_a : Graph, subtree_b : Graph):
         '''Implementa um operador de crossover simplificado'''
 
