@@ -1,7 +1,10 @@
 from os import path
+import functools
 
 from graph import Graph
 from graph.reader import ReaderORLibrary
+import os
+import pickle
 
 STEIN_B = [
     ("steinb1.txt",   82), # 0
@@ -36,3 +39,30 @@ def display(population):
     size = len(population)
     msg = f"Population {population.id} | size {size} | generation {population.generation}"
     print(msg)
+
+def update_best(population):
+    population._update_documented_best()
+
+def update_generation(population):
+
+    population.generation += 1
+
+def record_parents(crossover):
+
+    filename = os.path.join("log", "parentstest.pickle")
+
+    @functools.wraps(crossover)
+    def wrapper(*args):
+
+        self, parent_a, parent_b = args
+        # print(self.STPG.name)
+
+        child = crossover(*args)
+
+        with open(filename, "ab") as file:
+            pickle.dump([parent_a, parent_b, child],file)
+
+        return child
+
+    return wrapper
+
