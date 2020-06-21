@@ -13,13 +13,13 @@ from graph import Graph
 from graph.reader import ReaderORLibrary
 from pxsimpliest import SimpliestPX
 from treetools import Converter, Eval
-from util import display, read_problem
+from util import display, read_problem, update_best, update_generation
 
 PARAMS = {
     'dataset' : 'steinb1.txt',
     'best_known_cost' : 82,
     'population_size' : 100,
-    'n_iterations' : 25,
+    'n_iterations' : 2,
     'stagnation_interval' : 1_000,
 }
 
@@ -35,32 +35,35 @@ def simulation(params : dict, trial=0, output=None):
 
     population = (Population(chromosomes=[random_binary(lenght) for _ in range(population_size)],
                             eval_function=Eval(STPG),
-                            maximize=True)
-                        .evaluate()
-                        .callback(normalize))
+                            maximize=True))
 
     binary = (Evolution()
+                .evaluate()
+                .callback(normalize)
+                .callback(update_best)
                 .select(selection_func=roullete)
                 .crossover(combiner=crossover_2points)
                 .mutate(mutate_function=flip_onebit, probability=0.2)
-                .evaluate()
-                .callback(normalize)
-                .callback(display, every=100))
+                .callback(update_generation)
+                .callback(display, every=100)
+                )
 
     treegraph = (Evolution()
-                .select(selection_func=roullete)
-                .crossover(combiner=SimpliestPX(STPG)) # .mutate(mutate_function=flip_onebit, probability=0.2)
                 .evaluate()
                 .callback(normalize)
-                .callback(display, every=100))
+                .callback(update_best)
+                .select(selection_func=roullete)
+                .crossover(combiner=SimpliestPX(STPG)) # .mutate(mutate_function=flip_onebit, probability=0.2)
+                .callback(update_generation)
+                .callback(display, every=100)
+                )
 
     hybridi = (Evolution()
                 .repeat(binary, n=200)
                 .map(converter.binary2treegraph)
-                .evaluate()
                 .repeat(treegraph, n=200)
                 .map(converter.treegraph2binary)
-                .evaluate())
+                )
 
     # with IterationLimit(limit=params["n_iterations"]), \
     #     Stagnation(interval=params["stagnation_interval"]):

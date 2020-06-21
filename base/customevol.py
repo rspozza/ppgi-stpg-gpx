@@ -162,6 +162,7 @@ class SteinerPopulation(BasePopulation):
         result.pool = self.pool
         result.documented_best = self.documented_best
         result.id = self.id
+        result.stoppedby = self.stoppedby
         return result
 
     def breed(self,
@@ -195,7 +196,6 @@ class SteinerPopulation(BasePopulation):
         ####  self.generation += 1 ## generation should be counted here
         return self
 
-
     def evolve(self, evolution: 'Evolution', n: int = 1) -> 'BasePopulation':  # noqa: F821
         """Evolve the population according to an Evolution.
 
@@ -208,12 +208,10 @@ class SteinerPopulation(BasePopulation):
         try:
             for _ in range(n):
                 Condition.check(result)
-                result.generation += 1
                 for step in evolution:
                     result = step.apply(result)
-                result._update_documented_best()
-        except StopEvolution:
-            pass
+        except StopEvolution as error :
+            self.stoppedby = str(error)
         finally:
             self.run_time = time.time() - start
 

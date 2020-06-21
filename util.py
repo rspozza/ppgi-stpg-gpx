@@ -44,7 +44,6 @@ def update_best(population):
     population._update_documented_best()
 
 def update_generation(population):
-
     population.generation += 1
 
 def record_parents(crossover):

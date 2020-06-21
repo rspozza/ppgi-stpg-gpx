@@ -27,11 +27,13 @@ def simulation(STPG, trial=0, output=None):
                         .callback(normalize))
 
     evo = (Evolution()
+        .evaluate()
+        .callback(normalize)
+        .callback(update_best)
         .select(selection_func=roullete)
         .crossover(combiner=crossover_2points)
         .mutate(mutate_function=flip_onebit, probability=0.2)
-        .evaluate()
-        .callback(normalize)
+        .callback(update_generation)
         .callback(display, every=100)
         )
 
