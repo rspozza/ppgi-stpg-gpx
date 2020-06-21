@@ -20,7 +20,7 @@ def evaluate_binary(chromosome, STPG : SteinerTreeProblem, penality):
 
     GRAPH = STPG.graph
     terminals = STPG.terminals
-    nro_vertices = STPG.nro
+    nro_vertices = STPG.nro_nodes
 
     ## identifica todos os vértices da solução candidata (terminais e não terminais)
     vertices = vertices_from_binary_chromosome(chromosome, terminals, nro_vertices)
