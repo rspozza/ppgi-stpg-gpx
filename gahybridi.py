@@ -10,10 +10,10 @@ from base.mutate import flip_onebit
 from base.normalization import normalize
 from base.selector import roullete
 from graph import Graph
-from graph.reader import ReaderORLibrary
+from graph.reader import read_problem
 from pxsimpliest import SimpliestPX
 from treetools import Converter, Eval
-from util import display, read_problem, update_best, update_generation
+from base.util import display, update_best, update_generation
 
 PARAMS = {
     'dataset' : 'steinb1.txt',

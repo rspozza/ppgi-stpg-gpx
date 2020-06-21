@@ -1,10 +1,6 @@
-from os import path
 import functools
-
-from graph import Graph
-from graph.reader import ReaderORLibrary
-import os
 import pickle
+import os
 
 STEIN_B = [
     ("steinb1.txt",   82), # 0
@@ -26,14 +22,6 @@ STEIN_B = [
     ("steinb17.txt", 131), # 16
     ("steinb18.txt", 218), # 17
 ]
-
-def read_problem(*filepath):
-
-    filename = path.join(*filepath)
-    reader = ReaderORLibrary()
-    STPG = reader.parser(filename)
-
-    return STPG
 
 def display(population):
     size = len(population)
@@ -65,3 +53,52 @@ def record_parents(crossover):
 
     return wrapper
 
+def update_best(population):
+    population._update_documented_best()
+
+def update_generation(population):
+    population.generation += 1
+
+def record_parents(crossover):
+
+    filename = os.path.join("log", "parentstest.pickle")
+
+    @functools.wraps(crossover)
+    def wrapper(*args):
+
+        self, parent_a, parent_b = args
+        # print(self.STPG.name)
+
+        child = crossover(*args)
+
+        with open(filename, "ab") as file:
+            pickle.dump([parent_a, parent_b, child],file)
+
+        return child
+
+    return wrapper
+
+def update_best(population):
+    population._update_documented_best()
+
+def update_generation(population):
+    population.generation += 1
+
+def record_parents(crossover):
+
+    filename = os.path.join("log", "parentstest.pickle")
+
+    @functools.wraps(crossover)
+    def wrapper(*args):
+
+        self, parent_a, parent_b = args
+        # print(self.STPG.name)
+
+        child = crossover(*args)
+
+        with open(filename, "ab") as file:
+            pickle.dump([parent_a, parent_b, child],file)
+
+        return child
+
+    return wrapper

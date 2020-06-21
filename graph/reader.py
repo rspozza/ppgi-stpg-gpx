@@ -14,6 +14,14 @@ problems_class = {
         'others' : ['dv80.txt', 'dv160.txt', 'dv320.txt']
     }
 
+def read_problem(*filepath):
+
+    filename = os.path.join(*filepath)
+    reader = ReaderORLibrary()
+    STPG = reader.parser(filename)
+
+    return STPG
+
 def generate_file_names(key = None):
 
     if isinstance(problems_class[key], list) :
@@ -31,7 +39,7 @@ def generate_file_names(key = None):
 
 class SteinerTreeProblem(object):
     '''
-        The main purpose for this class is represent in memory the Steiner Problem's instance in memory.
+    The main purpose for this class is represent in memory the Steiner Problem's instance in memory.
     '''
 
     def __init__(self):

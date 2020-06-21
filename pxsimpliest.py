@@ -1,7 +1,7 @@
 from collections import deque
 from graph import Graph, SteinerTreeProblem
 
-from util import record_parents
+from base.util import record_parents
 
 class SimpliestPX:
     '''

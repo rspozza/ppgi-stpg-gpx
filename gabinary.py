@@ -10,9 +10,9 @@ from base.mutate import flip_onebit
 from base.normalization import normalize
 from base.selector import roullete
 from graph import Graph
-from graph.reader import ReaderORLibrary
+from graph.reader import read_problem
 from treetools import Eval
-from util import display, read_problem
+from base.util import display, read_problem
 
 
 def simulation(STPG, trial=0, output=None):
