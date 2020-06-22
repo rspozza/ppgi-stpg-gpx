@@ -10,24 +10,11 @@ from base.mutate import flip_onebit
 from base.normalization import normalize
 from base.selector import roullete
 from base.tracker import DataTracker
-from base.util import display, update_best, update_generation
+from base.util import display, update_best, update_generation, STEIN_B
 from graph import Graph
 from graph.reader import read_problem
 from pxsimpliest import SimpliestPX
 from treetools import Converter, Eval
-
-PARAMS = {
-    'runtrial' : 0,
-    'dataset' : 'steinb1.txt',
-    'globaloptimum'       : 82,
-    'population_size'     : 100,
-    'tx_mutation'         : 0.2,
-    'n_iterations'        : 2,
-    'iteration_binary'    : 250,
-    'iteration_treegraph' : 250,
-    'stagnation_interval' : 1_000,
-}
-
 
 def simulation(simulation_name, params : dict):
 
@@ -68,11 +55,10 @@ def simulation(simulation_name, params : dict):
                 )
 
     hybridi = (Evolution()
-                .repeat(binary, n=200)
+                .repeat(binary, n=params['iteration_binary'])
                 .map(converter.binary2treegraph)
-                .repeat(treegraph, n=200)
-                .map(converter.treegraph2binary)
-                )
+                .repeat(treegraph, n=params['iteration_treegraph'])
+                .map(converter.treegraph2binary))
 
     with IterationLimit(limit=101), \
         Stagnation(interval=params["stagnation_interval"]):
@@ -89,4 +75,21 @@ def simulation(simulation_name, params : dict):
 
 if __name__ == "__main__":
 
-    simulation("test", PARAMS)
+    PARAMS = {
+        'runtrial' : 0,
+        'dataset' : 'steinb1.txt',
+        'globaloptimum'       : 82,
+        'population_size'     : 100,
+        'tx_mutation'         : 0.2,
+        'n_iterations'        : 10,
+        'iteration_binary'    : 250,
+        'iteration_treegraph' : 250,
+        'stagnation_interval' : 1_000,
+    }
+
+    for dataset, value in STEIN_B[12:]:
+        PARAMS['dataset'] = dataset
+        PARAMS['globaloptimum'] = value
+        for i in range(30):
+            trial = i + 1
+            simulation("20200622_hybridirol", PARAMS)
