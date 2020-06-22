@@ -147,7 +147,7 @@ class SteinerPopulation(BasePopulation):
         self.individuals = [SteinerIndividual(chromosome=chromosome) for chromosome in chromosomes]
         self.intended_size = intended_size or len(self.individuals)
 
-        self.run_time = 0.0
+        self.runtime = 0.0
 
     def __copy__(self):
         result = self.__class__(chromosomes=[],
@@ -211,9 +211,10 @@ class SteinerPopulation(BasePopulation):
                 for step in evolution:
                     result = step.apply(result)
         except StopEvolution as error :
-            self.stoppedby = str(error)
+
+            result.stoppedby = str(error)
         finally:
-            self.run_time = time.time() - start
+            result.runtime = time.time() - start
 
         return result
 
