@@ -18,7 +18,11 @@ def best_vsothers(population):
     for other in container:
         yield bestdocumented, other
 
-def cartesian_product(population)
+def cartesian_product(population):
+    container = product(population, repeat=2)
+
+    for result in container:
+        yield result
 
 
 def roullete(individuals, n_parents=None):
