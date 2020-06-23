@@ -25,8 +25,8 @@ def is_steiner_tree(subgraph : Graph, STPG: SteinerTreeProblem):
     is_steiner = True
     status = dict()
 
-    terminals = set(STPG.terminals)
-    GRAPH = Graph(edges=STPG.graph) # :(
+    terminals = STPG.terminals
+    GRAPH = STPG.graph
     def is_terminal(v):
         return v in terminals
 
@@ -34,7 +34,7 @@ def is_steiner_tree(subgraph : Graph, STPG: SteinerTreeProblem):
     status['has_cycle'] = has_cycle(subgraph)
     status['all_terminals_in'] = all(subgraph.has_node(t) for t in terminals)
     status['all_leaves_are_terminals'] = all(is_terminal(v) for v in subgraph.vertices if subgraph.degree(v) == 1)
-    status['all_edges_are_reliable'] = all( GRAPH.has_edge(v,u) for v, u in subgraph.gen_undirect_edges() )
+    status['all_edges_are_reliable'] = all(GRAPH.has_edge(v,u) for v, u in subgraph.gen_undirect_edges())
     status['graph_is_connected'] = (how_many_components(subgraph) == 1)
 
     if status['has_cycle'] \

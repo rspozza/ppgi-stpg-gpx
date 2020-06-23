@@ -1,5 +1,6 @@
 import os
 import time
+from statistics import variance
 
 from base.chromosome import random_binary
 from base.combiner import crossover_2points
@@ -8,13 +9,23 @@ from base.customevol import SteinerEvolution as Evolution
 from base.customevol import SteinerPopulation as Population
 from base.mutate import flip_onebit
 from base.normalization import normalize
-from base.selector import roullete
+from base.selector import roullete, random_picker
 from base.tracker import DataTracker
-from base.util import display, update_best, update_generation, STEIN_B
+from base.util import STEIN_B, display, update_best, update_generation
+from evol.exceptions import StopEvolution
 from graph import Graph
 from graph.reader import read_problem
 from pxsimpliest import SimpliestPX
 from treetools import Converter, Eval
+
+
+def check_variance(population : 'Population'):
+    fitness_var = variance(p.fitness for p in population)
+    if fitness_var < 10 :
+        raise StopEvolution(f"Variance == {fitness_var}")
+
+def is_connected(individual : 'SteinerIndividual'):
+    return individual.qtd_partitions == 1
 
 def simulation(simulation_name, params : dict):
 
@@ -37,7 +48,7 @@ def simulation(simulation_name, params : dict):
                 .callback(update_best)
                 .callback(tracker.log_evaluation)
                 .select(selection_func=roullete)
-                .crossover(combiner=crossover_2points)
+                .crossover(combiner=crossover_2points, parent_picker=random_picker)
                 .mutate(mutate_function=flip_onebit, probability=0.2)
                 .callback(update_generation)
                 .callback(display, every=100)
@@ -49,7 +60,7 @@ def simulation(simulation_name, params : dict):
                 .callback(update_best)
                 .callback(tracker.log_evaluation)
                 .select(selection_func=roullete)
-                .crossover(combiner=SimpliestPX(STPG)) # .mutate(mutate_function=flip_onebit, probability=0.2)
+                .crossover(combiner=SimpliestPX(STPG), parent_picker=random_picker) # .mutate(mutate_function=flip_onebit, probability=0.2)
                 .callback(update_generation)
                 .callback(display, every=100)
                 )
@@ -64,8 +75,6 @@ def simulation(simulation_name, params : dict):
     with IterationLimit(limit=max_generation), \
         Stagnation(interval=params["stagnation_interval"]):
         result = population.evolve(hybridi, n=params["n_iterations"])
-
-    # result = population.evolve(hybridi, n=params["n_iterations"])
 
     tracker.log_simulation(params, STPG, result)
     tracker.report()
@@ -94,7 +103,7 @@ def cenario2(simulation_name, params : dict):
                 .callback(update_best)
                 .callback(tracker.log_evaluation)
                 .select(selection_func=roullete)
-                .crossover(combiner=crossover_2points)
+                .crossover(combiner=crossover_2points, parent_picker=random_picker)
                 .mutate(mutate_function=flip_onebit, probability=0.2)
                 .callback(update_generation)
                 .callback(display, every=100)
@@ -106,10 +115,10 @@ def cenario2(simulation_name, params : dict):
                 .callback(update_best)
                 .callback(tracker.log_evaluation)
                 .select(selection_func=roullete)
-                .crossover(combiner=SimpliestPX(STPG)) # .mutate(mutate_function=flip_onebit, probability=0.2)
+                .crossover(combiner=SimpliestPX(STPG), parent_picker=random_picker) # .mutate(mutate_function=flip_onebit, probability=0.2)
                 .callback(update_generation)
                 .callback(display, every=100)
-                .callback(checkvariance))
+                .callback(check_variance))
 
     hybridi = (Evolution()
                 .repeat(binary, n=params['iteration_binary'])
@@ -152,4 +161,4 @@ if __name__ == "__main__":
         PARAMS['globaloptimum'] = value
         for i in range(30):
             PARAMS['runtrial'] = i + 1
-            simulation("20200622_hybridirol", PARAMS)
+            cenario2("20200622_hybridirol", PARAMS)
