@@ -1,6 +1,25 @@
+from itertools import cycle, product
 from random import choices
 from operator import attrgetter
 from evol import Population
+
+def random_picker(population):
+    while True:
+        yield tuple(choices(population, k=2))
+
+def best_vsothers(population):
+    bestdocumented = population.documented_best
+
+    if bestdocumented is None:
+        yield from random_picker(population)
+
+    container = cycle(population)
+
+    for other in container:
+        yield bestdocumented, other
+
+def cartesian_product(population)
+
 
 def roullete(individuals, n_parents=None):
     '''Selection based on fitness value
