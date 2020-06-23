@@ -146,7 +146,7 @@ class SteinerPopulation(BasePopulation):
 
         self.individuals = [SteinerIndividual(chromosome=chromosome) for chromosome in chromosomes]
         self.intended_size = intended_size or len(self.individuals)
-
+        self.stoppedby = None
         self.runtime = 0.0
 
     def __copy__(self):
