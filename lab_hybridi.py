@@ -80,15 +80,17 @@ if __name__ == "__main__":
         'globaloptimum'       : 82,
         'population_size'     : 100,
         'tx_mutation'         : 0.2,
-        'n_iterations'        : 10,
+        'n_iterations'        : 20,
         'iteration_binary'    : 250,
         'iteration_treegraph' : 250,
         'stagnation_interval' : 1_000,
     }
 
-    for dataset, value in STEIN_B[12:]:
+    for dataset, value in STEIN_B[13:]:
         PARAMS['dataset'] = dataset
         PARAMS['globaloptimum'] = value
         for i in range(30):
             PARAMS['runtrial'] = i + 1
-            simulation("20200622_hybridirol", PARAMS)
+            simulation("20200624_hybriditest", PARAMS)
+
+    os.system("shutdown -t 300")
