@@ -41,57 +41,7 @@ def record_parents(crossover):
     @functools.wraps(crossover)
     def wrapper(*args):
 
-        self, parent_a, parent_b = args
-        # print(self.STPG.name)
-
-        child = crossover(*args)
-
-        with open(filename, "ab") as file:
-            pickle.dump([parent_a, parent_b, child],file)
-
-        return child
-
-    return wrapper
-
-def update_best(population):
-    population._update_documented_best()
-
-def update_generation(population):
-    population.generation += 1
-
-def record_parents(crossover):
-
-    filename = os.path.join("log", "parentstest.pickle")
-
-    @functools.wraps(crossover)
-    def wrapper(*args):
-
-        self, parent_a, parent_b = args
-        # print(self.STPG.name)
-
-        child = crossover(*args)
-
-        with open(filename, "ab") as file:
-            pickle.dump([parent_a, parent_b, child],file)
-
-        return child
-
-    return wrapper
-
-def update_best(population):
-    population._update_documented_best()
-
-def update_generation(population):
-    population.generation += 1
-
-def record_parents(crossover):
-
-    filename = os.path.join("log", "parentstest.pickle")
-
-    @functools.wraps(crossover)
-    def wrapper(*args):
-
-        self, parent_a, parent_b = args
+        _ , parent_a, parent_b = args
         # print(self.STPG.name)
 
         child = crossover(*args)
