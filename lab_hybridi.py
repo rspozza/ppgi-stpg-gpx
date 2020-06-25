@@ -16,7 +16,7 @@ from graph.reader import read_problem
 from pxsimpliest import SimpliestPX
 from treetools import Converter, Eval
 
-def simulation(simulation_name, params : dict):
+def simulation(simulation_name, params : dict, get_evol : callable):
 
     STPG = read_problem("datasets", "ORLibrary", params["dataset"])
     lenght = STPG.nro_nodes - STPG.nro_terminals
@@ -30,6 +30,23 @@ def simulation(simulation_name, params : dict):
                             .callback(normalize)
                             .callback(update_best)
                             )
+
+    evol = get_evol(STPG, tracker, converter, params)
+
+    max_generation = params['n_iterations'] * (params['iteration_binary'] + params['iteration_treegraph'])
+    with IterationLimit(limit=max_generation), \
+        Stagnation(interval=params["stagnation_interval"]):
+        result = population.evolve(evol, n=params["n_iterations"])
+
+    tracker.log_simulation(params, STPG, result)
+    tracker.report()
+
+    print(result.stoppedby)
+
+    return result
+
+
+def sim_hybridi(STPG, tracker, converter, params):
 
     binary = (Evolution()
                 .evaluate()
@@ -60,17 +77,7 @@ def simulation(simulation_name, params : dict):
                 .repeat(treegraph, n=params['iteration_treegraph'])
                 .map(converter.treegraph2binary))
 
-    max_generation = params['n_iterations'] * (params['iteration_binary'] + params['iteration_treegraph'])
-    with IterationLimit(limit=max_generation), \
-        Stagnation(interval=params["stagnation_interval"]):
-        result = population.evolve(hybridi, n=params["n_iterations"])
-
-    tracker.log_simulation(params, STPG, result)
-    tracker.report()
-
-    print(result.stoppedby)
-
-    return result
+    return hybridi
 
 if __name__ == "__main__":
 
@@ -86,11 +93,9 @@ if __name__ == "__main__":
         'stagnation_interval' : 1_000,
     }
 
-    for dataset, value in STEIN_B[13:]:
+    for dataset, value in STEIN_B[14:15]:
         PARAMS['dataset'] = dataset
         PARAMS['globaloptimum'] = value
         for i in range(30):
             PARAMS['runtrial'] = i + 1
-            simulation("20200624_hybriditest", PARAMS)
-
-    os.system("shutdown -t 300")
+            simulation("20200625_hybriditest", PARAMS, get_evol=sim_hybridi)
