@@ -4,6 +4,8 @@ import re
 import os
 from collections import defaultdict
 
+from .graph import Graph
+
 problems_class = {
         'b' : {'max' : 18},
         'c' : {'max' : 20},
@@ -11,6 +13,14 @@ problems_class = {
         'e' : {'max' : 20},
         'others' : ['dv80.txt', 'dv160.txt', 'dv320.txt']
     }
+
+def read_problem(*filepath):
+
+    filename = os.path.join(*filepath)
+    reader = ReaderORLibrary()
+    STPG = reader.parser(filename)
+
+    return STPG
 
 def generate_file_names(key = None):
 
@@ -29,15 +39,15 @@ def generate_file_names(key = None):
 
 class SteinerTreeProblem(object):
     '''
-        The main purpose for this class is represent in memory the Steiner Problem's instance in memory.
+    The main purpose for this class is represent in memory the Steiner Problem's instance in memory.
     '''
 
     def __init__(self):
         self.nro_nodes = 0
         self.nro_edges = 0
         self.nro_terminals = 0
-        self.graph = defaultdict(dict)
-        self.terminals = list()
+        self.graph = Graph()
+        self.terminals = set()
 
         self.name = None
         self.remark = None
@@ -103,8 +113,7 @@ class Reader(object):
                 w = int(w)
                 peso = int(peso)
 
-                self.STP.graph[v][w] = peso
-                self.STP.graph[w][v] = peso
+                self.STP.graph.add_edge(v,w, weight=peso)
 
             elif line.startswith("Nodes"):
                 nodes = re.findall(r'Nodes (\d+)$', line)
@@ -123,7 +132,7 @@ class Reader(object):
             if line.startswith("T "):
                 _string = re.findall(r"(\d+)$", line)
                 v_terminal = int(_string[0]) if len(_string) == 1 else -1
-                self.STP.terminals.append(v_terminal)
+                self.STP.terminals.add(v_terminal)
 
             elif line.startswith("Terminals"):
                 terminal = re.findall(r'Terminals (\d+)$', line)
@@ -192,8 +201,7 @@ class ReaderORLibrary():
                 v = entries[1]
                 weight = entries[2]
 
-                STP.graph[u][v] = weight
-                STP.graph[v][u] = weight
+                STP.graph.add_edge(u, v, weight=weight)
                 counter += 1
 
             # number of vertices to be connected together
@@ -206,10 +214,10 @@ class ReaderORLibrary():
             line = FILE.readline()
 
             # for some problems' instance, the terminals are represented in more than one line
-            terminals = list()
+            terminals = set()
             while line:
                 entries = [ int(e) for e in re.findall(r'(\d+)', line) if e.isdecimal()]
-                terminals.extend(entries)
+                terminals.update(entries)
                 line = FILE.readline()
 
             assert len(terminals) == entry[0], "Numer of terminals is not ok"

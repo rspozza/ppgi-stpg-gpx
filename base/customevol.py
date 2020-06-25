@@ -146,8 +146,8 @@ class SteinerPopulation(BasePopulation):
 
         self.individuals = [SteinerIndividual(chromosome=chromosome) for chromosome in chromosomes]
         self.intended_size = intended_size or len(self.individuals)
-
-        self.run_time = 0.0
+        self.stoppedby = None
+        self.runtime = 0.0
 
     def __copy__(self):
         result = self.__class__(chromosomes=[],
@@ -162,6 +162,7 @@ class SteinerPopulation(BasePopulation):
         result.pool = self.pool
         result.documented_best = self.documented_best
         result.id = self.id
+        result.stoppedby = self.stoppedby
         return result
 
     def breed(self,
@@ -184,17 +185,16 @@ class SteinerPopulation(BasePopulation):
             Arguments are only passed to the functions if they accept them.
         :return: self
         """
-        raise RuntimeWarning("offspring_generator instanciate with a Individual not a SteinerIndividual")
-        if population_size:
-            self.intended_size = population_size
-        offspring = offspring_generator(parents=self.individuals,
-                                        parent_picker=select_arguments(parent_picker),
-                                        combiner=select_arguments(combiner),
-                                        **kwargs)
-        self.individuals += list(islice(offspring, self.intended_size - len(self.individuals)))
+        # raise RuntimeWarning("offspring_generator instanciate with a Individual not a SteinerIndividual")
+        # if population_size:
+        #     self.intended_size = population_size
+        # offspring = offspring_generator(parents=self.individuals,
+        #                                 parent_picker=select_arguments(parent_picker),
+        #                                 combiner=select_arguments(combiner),
+        #                                 **kwargs)
+        # self.individuals += list(islice(offspring, self.intended_size - len(self.individuals)))
         ####  self.generation += 1 ## generation should be counted here
         return self
-
 
     def evolve(self, evolution: 'Evolution', n: int = 1) -> 'BasePopulation':  # noqa: F821
         """Evolve the population according to an Evolution.
@@ -208,14 +208,13 @@ class SteinerPopulation(BasePopulation):
         try:
             for _ in range(n):
                 Condition.check(result)
-                result.generation += 1
                 for step in evolution:
                     result = step.apply(result)
-                result._update_documented_best()
-        except StopEvolution:
-            pass
+        except StopEvolution as error :
+
+            result.stoppedby = str(error)
         finally:
-            self.run_time = time.time() - start
+            result.runtime = time.time() - start
 
         return result
 
@@ -262,6 +261,7 @@ class SteinerPopulation(BasePopulation):
 
     def crossover(self,
               combiner : Callable,
+              parent_picker : Callable,
               population_size: Optional[int] = None,
               **kwargs) -> 'Population':
 
@@ -270,8 +270,10 @@ class SteinerPopulation(BasePopulation):
 
         newpopulation = list()
 
+        pick = parent_picker(self.individuals) # :(
+
         while len(newpopulation) < self.intended_size:
-            parent_a, parent_b = choices(self.individuals, k=2)
+            parent_a, parent_b = next(pick)
             child = combiner(parent_a.chromosome, parent_b.chromosome)
             newpopulation.append(SteinerIndividual(child))
 

@@ -5,6 +5,7 @@ from evol.exceptions import StopEvolution
 class IterationLimit(Condition):
 
     def __init__(self, limit : int):
+        super().__init__(None)
         self.limit = limit
 
     def __call__(self, population : 'Population'):

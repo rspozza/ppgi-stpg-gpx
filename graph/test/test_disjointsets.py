@@ -93,7 +93,7 @@ class TestDisjointSets(unittest.TestCase):
 
         self.assertEqual(nro_edges, 8)
         self.assertEqual(cost, 37)
-        self.assertFalse(has_cycle(graph))
+        self.assertFalse(has_cycle(tree))
 
 
 if __name__ == "__main__":
