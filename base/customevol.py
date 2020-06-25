@@ -261,6 +261,7 @@ class SteinerPopulation(BasePopulation):
 
     def crossover(self,
               combiner : Callable,
+              parent_picker : Callable,
               population_size: Optional[int] = None,
               **kwargs) -> 'Population':
 
@@ -269,8 +270,10 @@ class SteinerPopulation(BasePopulation):
 
         newpopulation = list()
 
+        pick = parent_picker(self.individuals) # :(
+
         while len(newpopulation) < self.intended_size:
-            parent_a, parent_b = choices(self.individuals, k=2)
+            parent_a, parent_b = next(pick)
             child = combiner(parent_a.chromosome, parent_b.chromosome)
             newpopulation.append(SteinerIndividual(child))
 

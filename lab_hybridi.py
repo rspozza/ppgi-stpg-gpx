@@ -8,7 +8,7 @@ from base.customevol import SteinerEvolution as Evolution
 from base.customevol import SteinerPopulation as Population
 from base.mutate import flip_onebit
 from base.normalization import normalize
-from base.selector import roullete
+from base.selector import random_picker, roullete
 from base.tracker import DataTracker
 from base.util import display, update_best, update_generation, STEIN_B
 from graph import Graph
@@ -37,7 +37,7 @@ def simulation(simulation_name, params : dict):
                 .callback(update_best)
                 .callback(tracker.log_evaluation)
                 .select(selection_func=roullete)
-                .crossover(combiner=crossover_2points)
+                .crossover(combiner=crossover_2points, parent_picker=random_picker)
                 .mutate(mutate_function=flip_onebit, probability=0.2)
                 .callback(update_generation)
                 .callback(display, every=100)
@@ -49,7 +49,7 @@ def simulation(simulation_name, params : dict):
                 .callback(update_best)
                 .callback(tracker.log_evaluation)
                 .select(selection_func=roullete)
-                .crossover(combiner=SimpliestPX(STPG)) # .mutate(mutate_function=flip_onebit, probability=0.2)
+                .crossover(combiner=SimpliestPX(STPG), parent_picker=random_picker) # .mutate(mutate_function=flip_onebit, probability=0.2)
                 .callback(update_generation)
                 .callback(display, every=100)
                 )
@@ -64,67 +64,6 @@ def simulation(simulation_name, params : dict):
     with IterationLimit(limit=max_generation), \
         Stagnation(interval=params["stagnation_interval"]):
         result = population.evolve(hybridi, n=params["n_iterations"])
-
-    # result = population.evolve(hybridi, n=params["n_iterations"])
-
-    tracker.log_simulation(params, STPG, result)
-    tracker.report()
-
-    print(result.stoppedby)
-
-    return result
-
-def cenario2(simulation_name, params : dict):
-
-    STPG = read_problem("datasets", "ORLibrary", params["dataset"])
-    lenght = STPG.nro_nodes - STPG.nro_terminals
-    converter = Converter(STPG)
-    tracker = DataTracker(params['runtrial'], target=os.path.join("outputdata", simulation_name, STPG.name))
-
-    population = (Population(chromosomes=[ random_binary(lenght) for _ in range(params["population_size"]) ],
-                            eval_function=Eval(STPG),
-                            maximize=True)
-                            .evaluate()
-                            .callback(normalize)
-                            .callback(update_best))
-
-    binary = (Evolution()
-                .evaluate()
-                .callback(normalize)
-                .callback(update_best)
-                .callback(tracker.log_evaluation)
-                .select(selection_func=roullete)
-                .crossover(combiner=crossover_2points)
-                .mutate(mutate_function=flip_onebit, probability=0.2)
-                .callback(update_generation)
-                .callback(display, every=100)
-                )
-
-    treegraph = (Evolution()
-                .evaluate()
-                .callback(normalize)
-                .callback(update_best)
-                .callback(tracker.log_evaluation)
-                .select(selection_func=roullete)
-                .crossover(combiner=SimpliestPX(STPG)) # .mutate(mutate_function=flip_onebit, probability=0.2)
-                .callback(update_generation)
-                .callback(display, every=100)
-                .callback(checkvariance))
-
-    hybridi = (Evolution()
-                .repeat(binary, n=params['iteration_binary'])
-                .map(converter.binary2treegraph)
-                .filter(is_connected)
-                .repeat(treegraph, n=params['iteration_treegraph'])
-                .map(converter.treegraph2binary))
-
-    max_generation = params['n_iterations'] * (params['iteration_binary'] + params['iteration_treegraph'])
-
-    with IterationLimit(limit=max_generation), \
-        Stagnation(interval=params["stagnation_interval"]):
-        result = population.evolve(hybridi, n=params["n_iterations"])
-
-    # result = population.evolve(hybridi, n=params["n_iterations"])
 
     tracker.log_simulation(params, STPG, result)
     tracker.report()
@@ -141,15 +80,17 @@ if __name__ == "__main__":
         'globaloptimum'       : 82,
         'population_size'     : 100,
         'tx_mutation'         : 0.2,
-        'n_iterations'        : 10,
+        'n_iterations'        : 20,
         'iteration_binary'    : 250,
         'iteration_treegraph' : 250,
         'stagnation_interval' : 1_000,
     }
 
-    for dataset, value in STEIN_B[12:]:
+    for dataset, value in STEIN_B[13:]:
         PARAMS['dataset'] = dataset
         PARAMS['globaloptimum'] = value
         for i in range(30):
             PARAMS['runtrial'] = i + 1
-            simulation("20200622_hybridirol", PARAMS)
+            simulation("20200624_hybriditest", PARAMS)
+
+    os.system("shutdown -t 300")

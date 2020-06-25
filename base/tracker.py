@@ -3,7 +3,7 @@ import json
 import os
 import logging
 from collections import defaultdict
-from statistics import fmean, pvariance
+from statistics import pvariance, mean as fmean
 
 class DataLogger:
     '''Simple class to collect and store data from the simulations.
