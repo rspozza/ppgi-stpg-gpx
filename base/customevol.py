@@ -210,12 +210,17 @@ class SteinerPopulation(BasePopulation):
                 Condition.check(result)
                 for step in evolution:
                     result = step.apply(result)
-        except StopEvolution as error :
+            else :
+                result.stoppedby = "IterationLimit"
 
+        except StopEvolution as error :
             result.stoppedby = str(error)
+
         finally:
             result.runtime = time.time() - start
 
+        # never put a return statement at finally block
+        # altought you deserve everthing bad that to you
         return result
 
     def _update_documented_best(self):
