@@ -24,3 +24,13 @@ class Stagnation(Condition):
 
         if (generation - last_time_improvement) > self.interval:
             raise StopEvolution("stagnation")
+
+class BestKnownReached(Condition):
+
+    def __init__(self, global_optimum : int):
+        self.global_optimum = global_optimum
+
+    def __call__(self, population : 'Population'):
+        if population.documented_best \
+           and population.documented_best.fitness == self.global_optimum:
+           raise StopEvolution("BestKnowReached")
