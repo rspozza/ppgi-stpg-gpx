@@ -2,14 +2,15 @@ import os
 import time
 from statistics import variance
 
+from base.binary.combiner import crossover_1point, crossover_2points
 from base.chromosome import random_binary
-from base.combiner import crossover_2points
 from base.condition import IterationLimit, Stagnation
 from base.customevol import SteinerEvolution as Evolution
 from base.customevol import SteinerPopulation as Population
 from base.mutate import flip_onebit
 from base.normalization import normalize
-from base.selector import roullete, random_picker
+from base.pickers import random_picker
+from base.selector import roullete
 from base.tracker import DataTracker
 from base.util import STEIN_B, display, update_best, update_generation
 from evol.exceptions import StopEvolution

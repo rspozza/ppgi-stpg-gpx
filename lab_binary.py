@@ -1,19 +1,21 @@
 import os
 import time
 
+from base.binary.combiner import crossover_1point, crossover_2points
 from base.chromosome import random_binary
-from base.combiner import crossover_1point, crossover_2points
 from base.condition import IterationLimit, Stagnation
 from base.customevol import SteinerEvolution as Evolution
 from base.customevol import SteinerPopulation as Population
 from base.mutate import flip_onebit
 from base.normalization import normalize
-from base.selector import random_picker, roullete
+from base.pickers import random_picker
+from base.selector import roullete
 from base.tracker import DataTracker
-from base.util import display, update_best, update_generation, STEIN_B
+from base.util import STEIN_B, display, update_best, update_generation
 from graph import Graph
 from graph.reader import read_problem
 from treetools import Eval
+
 
 def simulation(simulation_name, params : dict, get_evol : callable):
 
@@ -74,4 +76,4 @@ if __name__ == "__main__":
         PARAMS['globaloptimum'] = value
         for i in range(30):
             PARAMS['runtrial'] = i + 1
-            simulation("20200626_binary", PARAMS, get_evol=sim_binary_1pointcrossover)
+            simulation("20200701_binary", PARAMS, get_evol=sim_binary_1pointcrossover)
