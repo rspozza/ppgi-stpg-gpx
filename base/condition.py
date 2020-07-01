@@ -23,7 +23,7 @@ class Stagnation(Condition):
         last_time_improvement = population.documented_best.last_improvement
 
         if (generation - last_time_improvement) > self.interval:
-            raise StopEvolution("stagnation")
+            raise StopEvolution("Stagnation")
 
 class BestKnownReached(Condition):
 

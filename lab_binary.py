@@ -1,19 +1,21 @@
 import os
 import time
 
+from base.binary.combiner import crossover_1point, crossover_2points
 from base.chromosome import random_binary
-from base.combiner import crossover_1point, crossover_2points
-from base.condition import IterationLimit, Stagnation
+from base.condition import BestKnownReached, Stagnation
 from base.customevol import SteinerEvolution as Evolution
 from base.customevol import SteinerPopulation as Population
 from base.mutate import flip_onebit
 from base.normalization import normalize
-from base.selector import random_picker, roullete
+from base.pickers import random_picker
+from base.selector import roullete
 from base.tracker import DataTracker
-from base.util import display, update_best, update_generation, STEIN_B
+from base.util import STEIN_B, display, update_best, update_generation
 from graph import Graph
 from graph.reader import read_problem
 from treetools import Eval
+
 
 def simulation(simulation_name, params : dict, get_evol : callable):
 
@@ -31,7 +33,7 @@ def simulation(simulation_name, params : dict, get_evol : callable):
 
     evol = get_evol(STPG, tracker, params)
 
-    with Stagnation(interval=params["stagnation_interval"]):
+    with Stagnation(interval=params["stagnation_interval"]), BestKnownReached(global_optimum=params["global_optimum"]):
         result = population.evolve(evol, n=params["n_iterations"])
 
     tracker.log_simulation(params, STPG, result)
@@ -57,21 +59,36 @@ def sim_binary_1pointcrossover(STPG, tracker, params):
 
     return binary
 
+def sim_binary_2pointcrossover(STPG, tracker, params):
+
+    binary = (Evolution()
+                .evaluate()
+                .callback(normalize)
+                .callback(update_best)
+                .callback(tracker.log_evaluation)
+                .select(selection_func=roullete)
+                .crossover(combiner=crossover_2points, parent_picker=random_picker)
+                .mutate(mutate_function=flip_onebit, probability=0.2)
+                .callback(update_generation)
+                .callback(display, every=100))
+
+    return binary
+
 if __name__ == "__main__":
 
     PARAMS = {
         'runtrial' : 0,
         'dataset' : 'steinb1.txt',
-        'globaloptimum'       : 82,
+        'global_optimum'       : 82,
         'population_size'     : 100,
         'tx_mutation'         : 0.2,
         'n_iterations'        : 5_000,
         'stagnation_interval' : 1_000,
     }
 
-    for dataset, value in STEIN_B[12:]:
+    for dataset, value in STEIN_B[13:]:
         PARAMS['dataset'] = dataset
-        PARAMS['globaloptimum'] = value
+        PARAMS['global_optimum'] = value
         for i in range(30):
             PARAMS['runtrial'] = i + 1
-            simulation("20200626_binary", PARAMS, get_evol=sim_binary_1pointcrossover)
+            simulation("20200704_binary_cx2pts", PARAMS, get_evol=sim_binary_2pointcrossover)

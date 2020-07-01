@@ -1,9 +1,8 @@
 
 import time
 from copy import copy
-from itertools import islice
 from random import choices
-from typing import Any, Callable, Iterable, Optional, Sequence
+from typing import Any, Callable, Generator, Iterable, List, Optional, Sequence, Union
 from uuid import uuid4
 
 from evol import Evolution, Individual
@@ -11,7 +10,7 @@ from evol.conditions import Condition
 from evol.exceptions import StopEvolution
 from evol.population import BasePopulation
 from evol.step import EvolutionStep
-from evol.utils import offspring_generator, select_arguments
+from evol.utils import select_arguments
 
 
 class SteinerIndividual(Individual):
@@ -270,18 +269,27 @@ class SteinerPopulation(BasePopulation):
               population_size: Optional[int] = None,
               **kwargs) -> 'Population':
 
-        if population_size:
-            self.intended_size = population_size
+        if not population_size:
+            population_size = self.intended_size
 
+        pick = parent_picker(self.individuals)
         newpopulation = list()
 
-        pick = parent_picker(self.individuals) # :(
+        while len(newpopulation) < population_size:
 
-        while len(newpopulation) < self.intended_size:
-            parent_a, parent_b = next(pick)
-            child = combiner(parent_a.chromosome, parent_b.chromosome)
-            newpopulation.append(SteinerIndividual(child))
+            parents = [individual.chromosome for individual in next(pick) ]
 
-        self.individuals = newpopulation
+            combined = combiner(*parents, **kwargs)
+
+            if isinstance(combined, Generator):
+                for child in combined:
+                    newpopulation.append(SteinerIndividual(chromosome=child))
+            else:
+                newpopulation.append(SteinerIndividual(chromosome=combined))
+
+        self._update_population(newpopulation)
 
         return self
+
+    def _update_population(self, new_population : 'SteinerPopulation'):
+        self.individuals = new_population

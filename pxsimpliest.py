@@ -19,7 +19,7 @@ class SimpliestPX:
         self.STPG = STPG
         self.GRAPH = STPG.graph
 
-    def __call__(self, subtree_a : Graph, subtree_b : Graph):
+    def __call__(self, subtree_a : Graph, subtree_b : Graph, **kwargs):
         return self.operator(subtree_a, subtree_b)
 
     @record_parents
