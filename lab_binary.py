@@ -92,3 +92,4 @@ if __name__ == "__main__":
         for i in range(30):
             PARAMS['runtrial'] = i + 1
             simulation("20200704_binary_cx2pts", PARAMS, get_evol=sim_binary_2pointcrossover)
+
