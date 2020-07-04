@@ -3,7 +3,11 @@ import time
 
 from base.binary.combiner import crossover_1point, crossover_2points
 from base.chromosome import random_binary
+<<<<<<< HEAD
 from base.condition import BestKnownReached, Stagnation
+=======
+from base.condition import IterationLimit, Stagnation
+>>>>>>> 03818e1cc161c968405904b37d15ed8ffa4119c9
 from base.customevol import SteinerEvolution as Evolution
 from base.customevol import SteinerPopulation as Population
 from base.mutate import flip_onebit
@@ -92,3 +96,4 @@ if __name__ == "__main__":
         for i in range(30):
             PARAMS['runtrial'] = i + 1
             simulation("20200704_binary_cx2pts", PARAMS, get_evol=sim_binary_2pointcrossover)
+
