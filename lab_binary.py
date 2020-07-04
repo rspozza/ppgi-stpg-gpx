@@ -59,6 +59,7 @@ def sim_binary_1pointcrossover(STPG, tracker, params):
 
     return binary
 
+
 def sim_binary_2pointcrossover(STPG, tracker, params):
 
     binary = (Evolution()
