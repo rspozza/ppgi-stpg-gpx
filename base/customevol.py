@@ -203,7 +203,7 @@ class SteinerPopulation(BasePopulation):
         :return: Population
         """
         result = copy(self)
-        start = time.time()
+        start = time.perf_counter()
         try:
             for _ in range(n):
                 Condition.check(result)
@@ -216,7 +216,7 @@ class SteinerPopulation(BasePopulation):
             result.stoppedby = str(error)
 
         finally:
-            result.runtime = time.time() - start
+            result.runtime = time.perf_counter() - start
 
         # never put a return statement at finally block
         # altought you deserve everthing bad that to you
