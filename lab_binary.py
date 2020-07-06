@@ -1,7 +1,7 @@
 import os
 import time
 
-from base.binary.combiner import crossover_1point, crossover_2points
+from base.binary.combiner import crossover_1point, crossover_2points, crossover_uniform
 from base.chromosome import random_binary
 from base.condition import BestKnownReached, BestSolutionKnowReached, Stagnation
 from base.customevol import SteinerEvolution as Evolution
@@ -54,7 +54,7 @@ def sim_binary_1pointcrossover(STPG, tracker, params):
                 .callback(tracker.log_evaluation)
                 .select(selection_func=roullete)
                 .crossover(combiner=crossover_1point, parent_picker=random_picker)
-                .mutate(mutate_function=flip_onebit, probability=0.2)
+                .mutate(mutate_function=flip_onebit, probability=params['tx_mutation'])
                 .callback(update_generation)
                 .callback(display, every=100))
 
@@ -70,7 +70,22 @@ def sim_binary_2pointcrossover(STPG, tracker, params):
                 .callback(tracker.log_evaluation)
                 .select(selection_func=roullete)
                 .crossover(combiner=crossover_2points, parent_picker=random_picker)
-                .mutate(mutate_function=flip_onebit, probability=0.2)
+                .mutate(mutate_function=flip_onebit, probability=params['tx_mutation'])
+                .callback(update_generation)
+                .callback(display, every=100))
+
+    return binary
+
+def sim_binary_uniformcrossover(STPG, tracker, params):
+
+    binary = (Evolution()
+                .evaluate()
+                .callback(normalize)
+                .callback(update_best)
+                .callback(tracker.log_evaluation)
+                .select(selection_func=roullete)
+                .crossover(combiner=crossover_uniform, parent_picker=random_picker)
+                .mutate(mutate_function=flip_onebit, probability=params['tx_mutation'])
                 .callback(update_generation)
                 .callback(display, every=100))
 
@@ -88,7 +103,7 @@ if __name__ == "__main__":
         'stagnation_interval' : 1_000,
     }
 
-    for dataset, value in STEIN_B[:5]:
+    for dataset, value in STEIN_B[5:]:
         PARAMS['dataset'] = dataset
         PARAMS['global_optimum'] = value
         for i in range(30):
