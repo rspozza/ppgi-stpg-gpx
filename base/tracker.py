@@ -250,7 +250,7 @@ class DataTracker(DataLogger):
             STPG.nro_nodes,
             STPG.nro_edges,
             STPG.nro_terminals,
-            params["globaloptimum"],          # simulation params >>
+            params["global_optimum"],          # simulation params >>
             params["tx_mutation"],
             POPULATION.intended_size,
             params["n_iterations"],
