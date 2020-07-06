@@ -3,7 +3,7 @@ import time
 
 from base.binary.combiner import crossover_1point, crossover_2points
 from base.chromosome import random_binary
-from base.condition import BestKnownReached, Stagnation
+from base.condition import BestKnownReached, BestSolutionKnowReached, Stagnation
 from base.customevol import SteinerEvolution as Evolution
 from base.customevol import SteinerPopulation as Population
 from base.mutate import flip_onebit
@@ -33,7 +33,8 @@ def simulation(simulation_name, params : dict, get_evol : callable):
 
     evol = get_evol(STPG, tracker, params)
 
-    with Stagnation(interval=params["stagnation_interval"]), BestKnownReached(global_optimum=params["global_optimum"]):
+    with Stagnation(interval=params["stagnation_interval"]), \
+        BestSolutionKnowReached(global_optimum=params["global_optimum"], STPG=STPG):
         result = population.evolve(evol, n=params["n_iterations"])
 
     tracker.log_simulation(params, STPG, result)
@@ -87,10 +88,10 @@ if __name__ == "__main__":
         'stagnation_interval' : 1_000,
     }
 
-    for dataset, value in STEIN_B[13:]:
+    for dataset, value in STEIN_B[:5]:
         PARAMS['dataset'] = dataset
         PARAMS['global_optimum'] = value
         for i in range(30):
             PARAMS['runtrial'] = i + 1
-            simulation("20200704_binary_cx2pts", PARAMS, get_evol=sim_binary_2pointcrossover)
+            simulation("20200705_binary_cx2pts", PARAMS, get_evol=sim_binary_2pointcrossover)
 
