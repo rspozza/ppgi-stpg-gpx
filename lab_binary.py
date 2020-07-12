@@ -76,6 +76,7 @@ def sim_binary_2pointcrossover(STPG, tracker, params):
 
     return binary
 
+
 def sim_binary_uniformcrossover(STPG, tracker, params):
 
     binary = (Evolution()
@@ -109,5 +110,5 @@ if __name__ == "__main__":
         PARAMS['global_optimum'] = value
         for i in range(30):
             PARAMS['runtrial'] = i + 1
-            simulation("20200705_binary_cx2pts", PARAMS, get_evol=sim_binary_2pointcrossover)
+            simulation("20200709_binary_cx1pt", PARAMS, get_evol=sim_binary_1pointcrossover)
 
