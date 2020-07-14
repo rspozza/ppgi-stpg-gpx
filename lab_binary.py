@@ -85,7 +85,7 @@ def sim_binary_uniformcrossover(STPG, tracker, params):
                 .callback(update_best)
                 .callback(tracker.log_evaluation)
                 .select(selection_func=roullete)
-                .crossover(combiner=crossover_uniform, parent_picker=random_picker)
+                .crossover(combiner=crossover_uniform, parent_picker=random_picker, pbcrossover=params['pbcrossover'])
                 .mutate(mutate_function=flip_onebit, probability=params['tx_mutation'])
                 .callback(update_generation)
                 .callback(display, every=100))
@@ -102,13 +102,14 @@ if __name__ == "__main__":
         'tx_mutation'         : 0.2,
         'n_iterations'        : 5_000,
         'stagnation_interval' : 1_000,
+        'pbcrossover' : 0.5
     }
 
     for dataset, value in STEIN_B:
-        print('='*10,'\n',dataset)
+        print('='*10,'\n', dataset)
         PARAMS['dataset'] = dataset
         PARAMS['global_optimum'] = value
         for i in range(30):
             PARAMS['runtrial'] = i + 1
-            simulation("20200709_binary_cx1pt", PARAMS, get_evol=sim_binary_1pointcrossover)
+            simulation("20200711_binary_uniformcrossover", PARAMS, get_evol=sim_binary_uniformcrossover)
 
