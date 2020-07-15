@@ -155,11 +155,7 @@ class ReaderORLibrary():
 
         STP = SteinerTreeProblem()
 
-        index = 0
-        if '\\' in file_name:
-            index = file_name.rfind('\\') + 1
-
-        STP.file_name = file_name[index:]
+        STP.file_name = os.path.basename(file_name)
 
         if STP.file_name.startswith("stein"):
             # "An SST-based algorithm for the Steiner problem in graphs" Networks 19 (1989) 1-16.
