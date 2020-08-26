@@ -72,11 +72,10 @@ def evaluate_treegraph(chromosome, STPG : SteinerTreeProblem, penality):
         qtd_partition = 0
         DS = DisjointSets()
 
+        for v in chromosome.vertices:
+            DS.make_set(v)
+
         for v, u in chromosome.gen_undirect_edges():
-            if v not in DS:
-                DS.make_set(v)
-            if u not in DS:
-                DS.make_set(u)
             if DS.find(v) == DS.find(u):
                 print("FOI IDENTIFICADO UM CICLO EM UMA DAS SOLUÇÕES")
             DS.union(v,u)

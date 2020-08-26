@@ -22,7 +22,7 @@ class SimpliestPX:
     def __call__(self, subtree_a : Graph, subtree_b : Graph, **kwargs):
         return self.operator(subtree_a, subtree_b)
 
-    @record_parents
+
     def operator(self, subtree_a : Graph, subtree_b : Graph):
         '''Implementa um operador de crossover simplificado'''
 

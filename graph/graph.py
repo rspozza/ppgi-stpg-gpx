@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*- 
+# -*- coding: utf-8 -*-
 from collections import defaultdict
 
 class _VerticeView(object):
@@ -11,7 +11,7 @@ class _VerticeView(object):
 
     def __contains__(self, item):
         return item in self.__vertices
-    
+
     def __iter__(self):
         return iter(self.__vertices)
 
@@ -30,6 +30,11 @@ class Graph(object):
 
         if isinstance(edges,defaultdict):
             self.__edges = edges
+
+        elif isinstance(edges, dict):
+            self.__edges = defaultdict(dict)
+            self.__edges.update(edges)
+
         elif edges is None:
             self.__edges = defaultdict(dict)
         else :
@@ -81,7 +86,7 @@ class Graph(object):
         '''
         if v == u :
             return
-        
+
         self.__edges[v][u] = weight
         self.__edges[u][v] = weight
 
@@ -108,7 +113,10 @@ class Graph(object):
         Retorna um objeto <iterator> com os vértices adjacentes ao vértice passado como parâmetro.
         Se não existe arestas com o vértice informado, um <KeyError> é lançado. Não faz essa verificação.
         '''
-        return self.__edges[v].keys()
+        if v in self.__edges:
+            return self.__edges[v].keys()
+        else :
+            return dict()
 
     def has_node(self, v):
         ''' Verifica se um vértice existe no grafo'''
@@ -116,18 +124,18 @@ class Graph(object):
 
     def has_edge(self, v, w):
         ''' Verifica se uma aresta existe no grafo '''
-        if self.has_node(v) :
-            return (w in self.__edges[v])
-        return False
+        return (v in self.__edges) and (w in self.__edges[v])
 
     def degree(self, v):
         ''' Retorna o grau de conexões de um vértice '''
-        adj = self.__edges[v]
-        return len(adj.keys())
+        if v in self.__edges:
+            return len(self.__edges[v].keys())
+        else :
+            return 0
 
     def weight(self, v, w):
         ''' Retorna o peso de uma aresta. Se a aresta não existe é retornado o valor 0 '''
-        if self.has_edge(v,w): 
+        if self.has_edge(v,w):
             return self.__edges[v][w]
         elif (v == w) and self.has_node(v):
             return 0
