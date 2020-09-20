@@ -15,6 +15,15 @@ class _VerticeView(object):
     def __iter__(self):
         return iter(self.__vertices)
 
+    def __and__(self, other):
+        return self.__vertices & other.__vertices
+
+    def __or__(self, other):
+        return self.__vertices | other.__vertices
+
+    def __xor__(self, other):
+        return self.__vertices ^ other.__vertices
+
 class Graph(object):
     '''
         Classe para representar um grafo.
