@@ -4,7 +4,7 @@ from collections import defaultdict
 from graph import Graph
 from graph.priorityqueue import PriorityQueue
 from graph.algorithms import shortest_path_dijkstra as dijkstra
-from graph.algorithms import prim
+from graph.algorithms import prim, kruskal
 
 
 def shortest_path(graph, start, terminals):
@@ -119,29 +119,71 @@ def shortest_path_origin_prim(graph, start, terminals):
 
 def prunning_mst(graph, start, terminals):
     '''
-    Determina a MST do grafo por meio do algoritmo de Prim.
-    Realiza a poda considerando os nós terminais como os nós folhas até a raiz <start>
-    Considera-se um algoritmo determinístico dado os mesmos parâmetros.
+    Parameters:
+        graph : Graph
+            Base graph to compute the Steiner tree
+        start : Node
+            Where is to start Prim's algorithm
+        terminals : Set
+            Terminals Nodes from the STPG instance
 
-    Resulta sempre na mesma árvore para qualquer vértice <start> considerado.
+    Return:
+        prunning : A Steiner Tree
+        total : Numeric - total cost of the tree
+
+    Notes:
+        Determina a MST do grafo por meio do algoritmo de Prim.
+        Realiza a poda considerando os nós terminais como os nós folhas até a raiz <start>
+        Se <start> for um vértice não terminal, o laço <while> verifica se <start> é um vértice folha da árvore resultande.
+        Em caso afirmativo realiza uma poda iterativa a partir desse vértice para garantir que a árvore resultante seja
+        uma árvore de Steiner.
+        Resulta sempre na mesma árvore para qualquer vértice <start> considerado.
     '''
-    mst, _ = prim(graph,start)
+    dict_tree, _ = prim(graph, start)
 
-    mst[start] = False
+    prunning = Graph()
 
-    mst_trim = Graph()
+    total = 0
 
-    total_weight = 0
+    for terminal in terminals:
+        current = terminal
+        while current != start:
+            previous = dict_tree[current]
+            if prunning.has_edge(current, previous):
+                current = start
+            else :
+                weight = graph.weight(current, previous)
+                prunning.add_edge(current, previous, weight=weight)
+                total += weight
+                current = previous
 
-    for t in terminals:
-        node = t
-        while mst[node]:
-            prev = mst[node]
-            if mst_trim.has_edge(prev,node):
-                break # já foi inserido esse ramo
-            weight = graph[prev][node]
-            total_weight += weight
-            mst_trim.add_edge(prev,node,weight=weight)
-            node = prev
+    current = start
+    while (current not in terminals) and (prunning.degree(current) == 1):
+        previous = list(prunning.adjacent_to(current)).pop()
+        total -= prunning.weight(current, previous)
+        prunning.remove_node(current)
+        current = previous
 
-    return mst_trim, total_weight
+    return prunning, total
+
+
+def prunning_kruskal_mst(graph : Graph, terminals):
+    """
+    Parameters:
+        graph : Graph
+        terminals : list of nodes
+
+    Return:
+        child : Graph
+            Steiner Tree
+    """
+    child = kruskal(graph)
+
+    while True:
+        non_terminal_leaves = {v for v in child.vertices if (v not in terminals) and (child.degree(v) == 1) }
+        if not non_terminal_leaves:
+            break
+        for node in non_terminal_leaves:
+            child.remove_node(node)
+
+    return child
