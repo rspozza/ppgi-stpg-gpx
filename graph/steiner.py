@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from collections import defaultdict
+from collections import defaultdict, deque
 
 from graph import Graph
 from graph.priorityqueue import PriorityQueue
@@ -179,11 +179,14 @@ def prunning_kruskal_mst(graph : Graph, terminals):
     """
     child = kruskal(graph)
 
-    while True:
-        non_terminal_leaves = {v for v in child.vertices if (v not in terminals) and (child.degree(v) == 1) }
-        if not non_terminal_leaves:
-            break
-        for node in non_terminal_leaves:
-            child.remove_node(node)
+    fifo = deque([v for v in child.vertices if (v not in terminals) and (child.degree(v) == 1)])
+
+    while fifo:
+        v = fifo.pop()
+        for w in child.adjacent_to(v):
+            if (w not in terminals) and (child.degree(w) == 2): # or child.degree(w) - 1 == 1 #
+                fifo.appendleft(w)
+
+        child.remove_node(v)
 
     return child
