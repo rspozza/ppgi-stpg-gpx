@@ -2,6 +2,7 @@ import pprint as pp
 import random
 from collections import deque
 from os import path
+import math
 
 import networkx as nx
 from matplotlib import pyplot as plt
@@ -81,7 +82,11 @@ def hierarchy_pos(G, root=None, width=1., vert_gap = 0.2, vert_loc = 0, xcenter 
 
     return _hierarchy_pos(G, root, width, vert_gap, vert_loc, xcenter)
 
-def draw_common(G, terminals, ggvermelho, ggazul):
+def draw_common(_grafo, terminals, _ggvermelho, _ggazul):
+    
+    G = nx.Graph(_grafo.edges)
+    ggvermelho = nx.Graph(_ggvermelho.edges)
+    ggazul = nx.Graph(_ggazul.edges)
 
     # G.add_edges_from(E1)
     def node_color(node):
@@ -111,23 +116,10 @@ def draw_common(G, terminals, ggvermelho, ggazul):
     nx.draw_kamada_kawai(G, with_labels=True, node_color=nd_colors, edge_color=ed_colors)
     # nx.draw_kamada_kawai(G, with_labels=False,node_size=50,node_color=nd_colors)
 
-    # pos = nx.kamada_kawai_layout(G)
-    # nx.draw_networkx_nodes(G,pos,with_labels=True,node_color=nd_colors)
-    # labels = nx.draw_networkx_labels(G, pos=pos)
-
-    # del labels
 
     plt.show()
 
     return G
-
-    # G = nx.Graph(stp.graph)
-
-    # plt.subplot()
-
-    # nx.draw_networkx(G,node_size=50,with_labels=False)
-
-    # plt.show()
 
 def draw_tree(graph, root : int):
 
@@ -144,17 +136,16 @@ def draw_tree(graph, root : int):
 
     plt.show()
 
-def draw_radial(graph, root):
-
-    if isinstance(graph,Graph):
-        graph = nx.Graph(graph.edges)
+def draw_radial(_graph, root, terminals):
+    
+    graph = nx.Graph(_graph.edges)
 
 
     pos = hierarchy_pos(graph, root=root, width = 2*math.pi, xcenter=0)
 
     pos_t = {u: (r * math.cos(theta), r * math.sin(theta)) for u, (theta, r) in pos.items()}
 
-    nx.draw(grafo,
+    nx.draw(graph,
         pos_t,
         node_color='#A0CBE2',
         edge_color='black',
@@ -162,9 +153,9 @@ def draw_radial(graph, root):
         node_size=100,
         with_labels=True)
 
-    nx.draw_networkx_nodes(grafo,
+    nx.draw_networkx_nodes(graph,
                            pos=pos_t,
-                           nodelist = STPG.terminals,
+                           nodelist = terminals,
                            node_color = 'red',
                            node_size = 150)
 
