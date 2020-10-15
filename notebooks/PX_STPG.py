@@ -282,7 +282,7 @@ bb = Graph(edges={
     'J' : {'I' : 1}
 })
 
-first, second = px(aa, bb, 'E')
+first, second = connected_componentes(aa, bb, 'E')
 
 
 # In[24]:
