@@ -13,7 +13,9 @@ def compose(red : Graph, blue : Graph):
 
     Return:
     -------
-        g_union, g_common, g_star : Graph
+        g_union : Graph
+        g_common : Graph
+        g_star : Graph
     '''
 
     g_union  = Graph()
@@ -40,7 +42,7 @@ def compose(red : Graph, blue : Graph):
 
 class Component:
 
-    def __init__(self, node):
+    def __init__(self):
         self.edges = set()
         self.portal = set()
         self.cost = 0
@@ -73,7 +75,7 @@ class PX_FindTestCompare:
         def belong_both(node):
             return red.has_node(node) and blue.has_node(node)
 
-        def chase(node, red_component, blue_component):
+        def chase(node, previous, red_component, blue_component):
 
             if node in visited:
                 return
@@ -82,6 +84,9 @@ class PX_FindTestCompare:
                 visited.add(node)
 
                 for v in g_star.adjacent_to(node):
+                    if v == previous:
+                        continue
+
                     if red.has_edge(node, v):
                         red_component.add(node, v)
                         red_component.cost += self.STPG.graph.W(node, v)
@@ -90,14 +95,16 @@ class PX_FindTestCompare:
                         blue_component.add(node, v)
                         blue_component.cost += self.STPG.graph.W(node, v)
 
-                    chase(v, red_component, blue_component)
+                    chase(v, node, red_component, blue_component)
 
         for s in g_star.vertices:
             if belong_both(s) and (s not in visited):
                 red_one = Component()
                 blue_one = Component()
 
-                chase(s, red_one, blue_one)
+                print('one component')
+
+                chase(s, None, red_one, blue_one)
 
                 if red_one.portal == blue_one.portal:
                     # ambas as partições possuem os mesmos vértices portais
@@ -139,28 +146,49 @@ class PX_FindTestCompare:
         return g_child
 
 
+def test_1():
+    from os import path
+    from random import sample
+    from graph import ReaderORLibrary
+
+    from graph.steiner import (prunning_mst, shortest_path,
+                            shortest_path_origin_prim,
+                            prunning_kruskal_mst,
+                            shortest_path_with_origin)
+    from graph.util import (is_steiner_tree,
+                                has_cycle,
+                                gg_total_weight)
+    dataset_file = 'steinc5.txt'
+
+    csv_output = 'resultado.csv'
+    graphs_output = 'grafos.pickle'
+
+    file = path.join('datasets','ORLibrary', dataset_file)
+
+    assert path.exists(file), "Arquivo especificado não existe"
+
+    reader = ReaderORLibrary()
+    stpg = reader.parser(file)
+    vertices = list(stpg.graph.vertices)
+
+    crossover = PX_FindTestCompare(stpg)
+    v, u = sample(vertices, 2)
+
+    aa, a_cost = shortest_path_with_origin(stpg.graph, v, stpg.terminals)
+    bb, b_cost = shortest_path_with_origin(stpg.graph, u, stpg.terminals)
+
+    child = crossover(bb, aa)
+    c_cost = gg_total_weight(child)
+
+    print(a_cost, b_cost, c_cost)
+
+    print(is_steiner_tree(aa, stpg))
+    print(is_steiner_tree(bb, stpg))
+    print(is_steiner_tree(child, stpg))
+
+    return aa, bb, child
+
 if __name__ == "__main__":
+    from graph.util import (is_steiner_tree, has_cycle)
 
-    aa = Graph(edges={
-        'A' : {'B' : 1, 'C' : 1},
-        'B' : {'A' : 1, 'D' : 1, 'E' : 1},
-        'D' : {'B' : 1},
-        'C' : {'A' : 1},
-        'E' : {'B' : 1, 'G' : 1},
-        'G' : {'E' : 1, 'H' : 1},
-        'H' : {'G' : 1}
-    })
-
-    bb = Graph(edges={
-        'A' : {'B' : 1, 'C' : 1},
-        'B' : {'A' : 1, 'D' : 1},
-        'D' : {'B' : 1},
-        'C' : {'A' : 1, 'F' : 1},
-        'F' : {'C' : 1, 'G' : 1},
-        'G' : {'F' : 1, 'H' : 1},
-        'H' : {'G' : 1}
-    })
-
-    g_union, g_common, g_star = compose(aa, bb)
-
-    first, second, previous = connected(g_union, aa, bb, 'A')
+    aa, bb, cc = test_1()

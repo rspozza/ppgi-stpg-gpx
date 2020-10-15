@@ -180,7 +180,7 @@ class PXtree:
         return g_common
 
 
-if __name__ == "__main__":
+def test_0():
 
     aa = Graph(edges={
         'A' : {'B' : 1, 'C' : 1},
@@ -205,3 +205,49 @@ if __name__ == "__main__":
     g_union, g_common, g_star = compose(aa, bb)
 
     first, second, previous = connected(g_union, aa, bb, 'A')
+
+def test_1():
+    from os import path
+    from random import sample
+    from graph import ReaderORLibrary
+
+    from graph.steiner import (prunning_mst, shortest_path,
+                            shortest_path_origin_prim,
+                            prunning_kruskal_mst,
+                            shortest_path_with_origin)
+
+    from graph.util import (is_steiner_tree,
+                            has_cycle,
+                            gg_total_weight)
+
+    dataset_file = 'steinc5.txt'
+
+    csv_output = 'resultado.csv'
+    graphs_output = 'grafos.pickle'
+
+    file = path.join('datasets','ORLibrary', dataset_file)
+
+    assert path.exists(file), "Arquivo especificado não existe"
+
+    reader = ReaderORLibrary()
+    stpg = reader.parser(file)
+    vertices = list(stpg.graph.vertices)
+
+    crossover = PXtree(stpg)
+    v, u = sample(vertices, 2)
+
+    aa, a_cost = shortest_path_with_origin(stpg.graph, v, stpg.terminals)
+    bb, b_cost = shortest_path_with_origin(stpg.graph, u, stpg.terminals)
+
+    child = crossover(bb, aa)
+    c_cost = gg_total_weight(child)
+
+    print(a_cost, b_cost, c_cost)
+    print(is_steiner_tree(aa, stpg))
+    print(is_steiner_tree(bb, stpg))
+    print(is_steiner_tree(child, stpg))
+
+    return aa, bb, child
+
+if __name__ == "__main__":
+    test_1()
