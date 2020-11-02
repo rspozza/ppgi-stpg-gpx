@@ -17,7 +17,7 @@ from evol.exceptions import StopEvolution
 from graph import Graph
 from graph.reader import read_problem
 from pxsimpliest import SimpliestPX
-from treetools import Converter, Eval
+from evaluation import Converter, Eval
 
 
 def check_variance(population : 'Population'):

@@ -15,7 +15,7 @@ from base.util import STEIN_B, display, update_best, update_generation
 from graph import Graph
 from graph.reader import read_problem
 from pxsimpliest import SimpliestPX
-from treetools import Converter, Eval
+from evaluation import Converter, Eval
 
 
 def simulation(simulation_name, params : dict, get_evol : callable):
