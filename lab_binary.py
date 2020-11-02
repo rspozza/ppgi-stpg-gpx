@@ -14,7 +14,7 @@ from base.tracker import DataTracker
 from base.util import STEIN_B, display, update_best, update_generation
 from graph import Graph
 from graph.reader import read_problem
-from treetools import Eval
+from evaluation import Eval
 
 
 def simulation(simulation_name, params : dict, get_evol : callable):
@@ -100,7 +100,7 @@ if __name__ == "__main__":
         'global_optimum'       : 82,
         'population_size'     : 100,
         'tx_mutation'         : 0.2,
-        'n_iterations'        : 5_000,
+        'n_iterations'        : 100,
         'stagnation_interval' : 1_000,
         'pbcrossover' : 0.5
     }

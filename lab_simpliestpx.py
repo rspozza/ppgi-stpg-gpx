@@ -63,7 +63,7 @@ def kapsalis_gpx(simulation_name, params : dict):
                 .crossover(combiner=SimpliestPX(STPG), parent_picker=random_picker) # .mutate(mutate_function=flip_onebit, probability=0.2)
                 .callback(update_generation)
                 .callback(display, every=10)
-                .callback(check_variance))
+                )
 
     hybridi = (Evolution()
                 .repeat(binary, n=params['iteration_binary'])
@@ -90,15 +90,15 @@ if __name__ == "__main__":
 
     PARAMS = {
         'runtrial' : 0,
-        'dataset' : 'steinb1.txt',
-        'globaloptimum'       : 82,
+        'dataset' : 'steinb4.txt',
+        'global_optimum'       : 59,
         'population_size'     : 50,
         'tx_mutation'         : 0.2,
         'n_iterations'        : 10,
-        'iteration_binary'    : 25,
-        'iteration_treegraph' : 25,
+        'iteration_binary'    : 50,
+        'iteration_treegraph' : 50,
         'stagnation_interval' : 1_000,
     }
 
 
-    kapsalis_gpx("20200622_kapsalisgpxtest", PARAMS)
+    kapsalis_gpx("20200622_hybridi-test", PARAMS)

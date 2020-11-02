@@ -331,3 +331,36 @@ def how_many_components(graph : Graph):
         DS.union(v,u)
 
     return len(DS.get_disjoint_sets())
+
+def compose(red : Graph, blue : Graph):
+    '''
+    Parameters:
+    ----------
+        red, blue : Graph
+
+    Return:
+    -------
+        g_union, g_common, g_star : Graph
+    '''
+
+    g_union  = Graph()
+    g_common = Graph()
+    g_star   = Graph()
+
+    for v, u in red.gen_undirect_edges():
+        g_union.add_edge(v,u, weight=red.W(v,u))
+
+        if not blue.has_edge(v,u):
+            g_star.add_edge(v,u)
+
+    for v, u in blue.gen_undirect_edges():
+        g_union.add_edge(v,u, weight=blue.W(v,u))
+
+        if red.has_edge(v,u):
+            w = red.W(v,u)
+            g_common.add_edge(v,u, weight=w)
+        else:
+            g_star.add_edge(v,u)
+
+
+    return g_union, g_common, g_star

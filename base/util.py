@@ -36,7 +36,7 @@ def update_generation(population):
 
 def record_parents(crossover):
 
-    filename = os.path.join("log", "parentstest.pickle")
+    filename = os.path.join("log", "individuals.pickle")
 
     @functools.wraps(crossover)
     def wrapper(*args):
@@ -47,7 +47,11 @@ def record_parents(crossover):
         child = crossover(*args)
 
         with open(filename, "ab") as file:
-            pickle.dump([parent_a, parent_b, child],file)
+            pickle.dump([
+                parent_a.edges,
+                parent_b.edges,
+                child.edges
+                ], file)
 
         return child
 
