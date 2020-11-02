@@ -4,7 +4,7 @@ from evol.exceptions import StopEvolution
 
 from graph import Graph
 from graph.util import is_steiner_tree
-from treetools import Converter
+from evaluation import Converter
 
 class IterationLimit(Condition):
 
