@@ -3,48 +3,16 @@ from operator import attrgetter
 from random import choice
 
 from graph import Graph
+from graph.util import compose
 from graph.disjointsets import DisjointSets
 
 
-def compose(red : Graph, blue : Graph):
-    '''
-    Parameters:
-    ----------
-        red, blue : Graph
-
-    Return:
-    -------
-        g_union, g_common, g_star : Graph
-    '''
-
-    g_union  = Graph()
-    g_common = Graph()
-    g_star   = Graph()
-
-    for v, u in red.gen_undirect_edges():
-        g_union.add_edge(v,u)
-
-        if not blue.has_edge(v,u):
-            g_star.add_edge(v,u)
-
-    for v, u in blue.gen_undirect_edges():
-        g_union.add_edge(v,u)
-
-        if red.has_edge(v,u):
-            w = red.W(v,u)
-            g_common.add_edge(v,u,weight=w)
-        else:
-            g_star.add_edge(v,u)
-
-
-    return g_union, g_common, g_star
-
 class Component:
 
-    def __init__(self, first, second, initialcost=None):
+    def __init__(self, first, second, initialcost=0):
         self.edges = {first : None, second : first}
         self.portal = set()
-        self.cost = initialcost or 0
+        self.cost = initialcost
 
     def add(self, first, second):
         self.edges[second] = first
@@ -177,7 +145,7 @@ class PXtree:
                 w = self.STPG.graph.W(v,u)
                 g_common.add_edge(v,u,weight=w)
 
-        return g_common
+        return g_common, success, fail
 
 
 def test_0():
