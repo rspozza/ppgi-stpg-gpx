@@ -3,7 +3,7 @@ import unittest
 from collections import deque
 from os import path
 
-from graph.graph import Graph
+from graph.graph import UndirectedWeightedGraph as Graph
 from graph.reader import ReaderORLibrary
 from graph.steiner import (prunning_mst, shortest_path,
                            shortest_path_origin_prim,

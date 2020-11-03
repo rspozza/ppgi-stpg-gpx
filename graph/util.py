@@ -1,6 +1,6 @@
 from collections import deque
 
-from graph.graph import Graph
+from graph.graph import UndirectedWeightedGraph as Graph
 from graph.reader import SteinerTreeProblem
 from graph.disjointsets import DisjointSets, Subset
 

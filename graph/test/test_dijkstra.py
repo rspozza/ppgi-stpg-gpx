@@ -1,6 +1,6 @@
 import unittest
 
-from graph.graph import Graph
+from graph.graph import UndirectedWeightedGraph as Graph
 from graph.algorithms import shortest_path_dijkstra as dijkstra
 
 class TestDijkstraImplementation(unittest.TestCase):

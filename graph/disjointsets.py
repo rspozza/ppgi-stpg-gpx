@@ -5,7 +5,6 @@ An implementation of Disjoint Set.
 @author: Giliard Almeida de Godoi
 """
 from collections import defaultdict
-from graph import Graph
 
 class Subset():
 

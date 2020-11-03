@@ -1,6 +1,6 @@
 import unittest
 
-from graph.graph import Graph
+from graph.graph import UndirectedWeightedGraph as Graph
 from graph.util import has_cycle, gg_total_weight, gg_edges_number
 from graph.algorithms import kruskal
 from graph.disjointsets import DisjointSets, Subset
@@ -11,17 +11,17 @@ class TestDisjointSets(unittest.TestCase):
 
         tree = Graph()
 
-        tree.add_edge('a', 'b')
-        tree.add_edge('a', 'c')
-        tree.add_edge('a', 'd')
-        tree.add_edge('b', 'e')
-        tree.add_edge('b', 'f')
-        tree.add_edge('c', 'g')
-        tree.add_edge('d', 'h')
-        tree.add_edge('d', 'i')
-        tree.add_edge('d', 'j')
-        tree.add_edge('j', 'k')
-        tree.add_edge('j', 'l')
+        tree.add_edge('a', 'b', weight=1)
+        tree.add_edge('a', 'c', weight=1)
+        tree.add_edge('a', 'd', weight=1)
+        tree.add_edge('b', 'e', weight=1)
+        tree.add_edge('b', 'f', weight=1)
+        tree.add_edge('c', 'g', weight=1)
+        tree.add_edge('d', 'h', weight=1)
+        tree.add_edge('d', 'i', weight=1)
+        tree.add_edge('d', 'j', weight=1)
+        tree.add_edge('j', 'k', weight=1)
+        tree.add_edge('j', 'l', weight=1)
 
         return tree
 
@@ -68,7 +68,7 @@ class TestDisjointSets(unittest.TestCase):
 
     def test_has_cycle(self):
         tree = self.tree_example()
-        tree.add_edge('g', 'a') ## has a cycle
+        tree.add_edge('g', 'a', weight=1) ## has a cycle
         self.assertTrue(has_cycle(tree))
 
     def teste_kruskal_mst_algorithm(self):

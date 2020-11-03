@@ -1,7 +1,7 @@
 import unittest
 from os import path
 
-from graph import Graph
+from graph.graph import UndirectedWeightedGraph as Graph
 from graph.algorithms import prim
 from graph.reader import ReaderORLibrary
 

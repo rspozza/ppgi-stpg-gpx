@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from collections import defaultdict, deque
 
-from graph import Graph
+from graph.graph import UndirectedWeightedGraph as Graph
 from graph.disjointsets import DisjointSets
 from graph.priorityqueue import PriorityQueue
 

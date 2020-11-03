@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from collections import defaultdict, deque
 
-from graph import Graph
+from graph.graph import UndirectedWeightedGraph as Graph
 from graph.priorityqueue import PriorityQueue
 from graph.algorithms import shortest_path_dijkstra as dijkstra
 from graph.algorithms import prim, kruskal

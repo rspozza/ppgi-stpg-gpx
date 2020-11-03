@@ -1,7 +1,7 @@
 import unittest
 import random
 
-from graph import Graph
+from graph.graph import UndirectedWeightedGraph as Graph
 from graph.algorithms import bfs, find_connected_components
 
 class TestBreadthFirstSearch(unittest.TestCase):
@@ -17,10 +17,10 @@ class TestBreadthFirstSearch(unittest.TestCase):
 
         for v in vertices :
             qtdAdj = random.randint(1,10)
-            adjacents = random.sample(vertices,qtdAdj)
+            adjacents = random.sample(vertices, qtdAdj)
             for a in adjacents :
                 if a != v :
-                    self.graph.add_edge(v,a)
+                    self.graph.add_edge(v, a, weight=random.randint(0, 15))
 
     def test_findOneComponent(self):
         self.add_component(range(1,51))
