@@ -4,7 +4,7 @@ import re
 import os
 from collections import defaultdict
 
-from graph.graph import UndirectedWeightedGraph as Graph
+from .graph import UndirectedWeightedGraph as Graph
 
 problems_class = {
         'b' : {'max' : 18},

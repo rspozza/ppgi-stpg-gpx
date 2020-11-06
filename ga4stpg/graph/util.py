@@ -1,8 +1,8 @@
 from collections import deque
 
-from graph.graph import UndirectedWeightedGraph as Graph
-from graph.reader import SteinerTreeProblem
-from graph.disjointsets import DisjointSets, Subset
+from .graph import UndirectedWeightedGraph as Graph
+from .reader import SteinerTreeProblem
+from .disjointsets import DisjointSets, Subset
 
 #######################################################################
 # VALIDATING A SOLUTION

@@ -106,6 +106,6 @@ venv.bak/
 #
 .vscode
 
-datasets/
-outputdata/
-log/
+data/*
+outputs/*
+logs/*

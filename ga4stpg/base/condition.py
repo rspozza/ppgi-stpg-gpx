@@ -1,10 +1,12 @@
 
 from evol.conditions import Condition
 from evol.exceptions import StopEvolution
+from ga4stpg.graph import Graph, SteinerTreeProblem
+from ga4stpg.graph.util import is_steiner_tree
 
-from graph import Graph
-from graph.util import is_steiner_tree
-from evaluation import Converter
+from .customevol import SteinerPopulation as Population
+from .evaluation import Converter
+
 
 class IterationLimit(Condition):
 
@@ -12,7 +14,7 @@ class IterationLimit(Condition):
         super().__init__(None)
         self.limit = limit
 
-    def __call__(self, population : 'Population'):
+    def __call__(self, population : Population):
         if population.generation >= self.limit:
             raise StopEvolution("max_generation_reached")
 
@@ -22,7 +24,7 @@ class Stagnation(Condition):
     def __init__(self, interval : int):
         self.interval = interval
 
-    def __call__(self, population : 'Population'):
+    def __call__(self, population : Population):
         generation = population.generation
         last_time_improvement = population.documented_best.last_improvement
 
@@ -34,7 +36,7 @@ class BestKnownReached(Condition):
     def __init__(self, global_optimum : int):
         self.global_optimum = global_optimum
 
-    def __call__(self, population : 'Population'):
+    def __call__(self, population : Population):
         if (population.documented_best
            and population.documented_best.cost == self.global_optimum):
            raise StopEvolution("BestKnowReached")
@@ -42,12 +44,12 @@ class BestKnownReached(Condition):
 
 class BestSolutionKnowReached(Condition):
 
-    def __init__(self, global_optimum : int, STPG : "SteinerTreeProblem" ):
+    def __init__(self, global_optimum : int, STPG : SteinerTreeProblem ):
         self.global_optimum = global_optimum
         self.STPG = STPG
         self.converter = Converter(STPG)
 
-    def __call__(self, population : 'Population'):
+    def __call__(self, population : Population):
         best_solution = population.documented_best
         if (best_solution is not None and best_solution.cost == self.global_optimum):
 

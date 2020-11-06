@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from collections import defaultdict, deque
 
-from graph.graph import UndirectedWeightedGraph as Graph
-from graph.disjointsets import DisjointSets
-from graph.priorityqueue import PriorityQueue
+from .graph import UndirectedWeightedGraph as Graph
+from .disjointsets import DisjointSets
+from .priorityqueue import PriorityQueue
 
 '''
     This module contains the most commons algorithms for work with graphs.

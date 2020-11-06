@@ -2,10 +2,10 @@ import random
 from itertools import compress, filterfalse
 from evol import Individual
 
-from base.customevol import SteinerIndividual
-from graph import Graph, SteinerTreeProblem
-from graph.disjointsets import DisjointSets
-from graph.priorityqueue import PriorityQueue
+from ga4stpg.base.customevol import SteinerIndividual
+from ga4stpg.graph import Graph, SteinerTreeProblem
+from ga4stpg.graph.disjointsets import DisjointSets
+from ga4stpg.graph.priorityqueue import PriorityQueue
 
 def vertices_from_binary_chromosome(chromosome, terminals, nro_vertices):
 

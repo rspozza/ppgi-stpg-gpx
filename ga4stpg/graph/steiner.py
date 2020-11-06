@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from collections import defaultdict, deque
 
-from graph.graph import UndirectedWeightedGraph as Graph
-from graph.priorityqueue import PriorityQueue
-from graph.algorithms import shortest_path_dijkstra as dijkstra
-from graph.algorithms import prim, kruskal
+from .graph import UndirectedWeightedGraph as Graph
+from .priorityqueue import PriorityQueue
+from .algorithms import shortest_path_dijkstra as dijkstra
+from .algorithms import prim, kruskal
 
 
 def shortest_path(graph, start, terminals):
