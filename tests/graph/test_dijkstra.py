@@ -1,7 +1,7 @@
 import unittest
 
-from graph.graph import UndirectedWeightedGraph as Graph
-from graph.algorithms import shortest_path_dijkstra as dijkstra
+from ga4stpg.graph.graph import UndirectedWeightedGraph as Graph
+from ga4stpg.graph.algorithms import shortest_path_dijkstra as dijkstra
 
 class TestDijkstraImplementation(unittest.TestCase):
 

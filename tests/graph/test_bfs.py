@@ -1,8 +1,8 @@
 import unittest
 import random
 
-from graph.graph import UndirectedWeightedGraph as Graph
-from graph.algorithms import bfs, find_connected_components
+from ga4stpg.graph.graph import UndirectedWeightedGraph as Graph
+from ga4stpg.graph.algorithms import bfs, find_connected_components
 
 class TestBreadthFirstSearch(unittest.TestCase):
 

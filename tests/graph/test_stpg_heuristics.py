@@ -3,9 +3,9 @@ import unittest
 from collections import deque
 from os import path
 
-from graph.graph import UndirectedWeightedGraph as Graph
-from graph.reader import ReaderORLibrary
-from graph.steiner import (prunning_mst, shortest_path,
+from ga4stpg.graph.graph import UndirectedWeightedGraph as Graph
+from ga4stpg.graph.reader import ReaderORLibrary
+from ga4stpg.graph.steiner import (prunning_mst, shortest_path,
                            shortest_path_origin_prim,
                            shortest_path_with_origin)
 
@@ -14,7 +14,7 @@ class TestSTPGHeuristicas(unittest.TestCase):
 
     def setUp(self):
         reader = ReaderORLibrary()
-        self.stpg_instance = reader.parser(path.join("datasets", "ORLibrary", "steinb13.txt"))
+        self.stpg_instance = reader.parser(path.join("data", "ORLibrary", "steinb13.txt"))
 
         self.graph = self.stpg_instance.graph
         self.terminals = list(self.stpg_instance.terminals)

@@ -1,16 +1,16 @@
 import unittest
 from os import path
 
-from graph.graph import UndirectedWeightedGraph as Graph
-from graph.algorithms import prim
-from graph.reader import ReaderORLibrary
+from ga4stpg.graph.graph import UndirectedWeightedGraph as Graph
+from ga4stpg.graph.algorithms import prim
+from ga4stpg.graph.reader import ReaderORLibrary
 
 class TestMinimumSpanningTree(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
 
-        arquivo = path.join("datasets", "ORLibrary", "steinb1.txt")
+        arquivo = path.join("data", "ORLibrary", "steinb1.txt")
         reader = ReaderORLibrary()
         cls.stp = reader.parser(arquivo)
         cls.graph = cls.stp.graph

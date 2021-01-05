@@ -1,9 +1,9 @@
 import unittest
 
-from graph.graph import UndirectedWeightedGraph as Graph
-from graph.util import has_cycle, gg_total_weight, gg_edges_number
-from graph.algorithms import kruskal
-from graph.disjointsets import DisjointSets, Subset
+from ga4stpg.graph.graph import UndirectedWeightedGraph as Graph
+from ga4stpg.graph.util import has_cycle, gg_total_weight, gg_edges_number
+from ga4stpg.graph.algorithms import kruskal
+from ga4stpg.graph.disjointsets import DisjointSets, Subset
 
 class TestDisjointSets(unittest.TestCase):
 

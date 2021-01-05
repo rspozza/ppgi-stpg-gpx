@@ -2,9 +2,9 @@ import unittest
 from collections import defaultdict
 from os import path
 
-from graph.graph import UndirectedWeightedGraph as Graph
-from graph.graph import _VerticeView
-from graph import ReaderORLibrary
+from ga4stpg.graph.graph import UndirectedWeightedGraph as Graph
+from ga4stpg.graph.graph import _VerticeView
+from ga4stpg.graph import ReaderORLibrary
 
 
 class TestGraphDictionaryDataStructure(unittest.TestCase):
@@ -174,7 +174,7 @@ class TestGraphDictionaryDataStructure(unittest.TestCase):
         self.assertFalse(graph.has_edge(5,5))
 
     def test_GenerateUndirectEdges(self):
-        diretorio_dados = path.join("datasets", "ORLibrary")
+        diretorio_dados = path.join("data", "ORLibrary")
         arquivo_dados = "steinb1.txt"
         arquivo = path.join(diretorio_dados, arquivo_dados)
 
@@ -192,7 +192,7 @@ class TestGraphDictionaryDataStructure(unittest.TestCase):
         self.assertEqual(len(edges),stp.nro_edges)
 
     def test_read_b01(self):
-        diretorio_dados = path.join("datasets", "ORLibrary")
+        diretorio_dados = path.join("data", "ORLibrary")
         arquivo_dados = "steinb1.txt"
         arquivo = path.join(diretorio_dados, arquivo_dados)
 
