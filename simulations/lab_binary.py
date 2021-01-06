@@ -1,25 +1,25 @@
 import os
 import time
 
-from base.binary.combiner import crossover_1point, crossover_2points, crossover_uniform
-from base.chromosome import random_binary
-from base.condition import BestKnownReached, BestSolutionKnowReached, Stagnation
-from base.customevol import SteinerEvolution as Evolution
-from base.customevol import SteinerPopulation as Population
-from base.mutate import flip_onebit
-from base.normalization import normalize
-from base.pickers import random_picker
-from base.selector import roullete
-from base.tracker import DataTracker
-from base.util import STEIN_B, display, update_best, update_generation
-from graph import Graph
-from graph.reader import read_problem
-from evaluation import Eval
+from ga4stpg.binary.combiner import crossover_1point, crossover_2points, crossover_uniform
+from ga4stpg.binary.chromosome import random_binary
+from ga4stpg.condition import BestKnownReached, BestSolutionKnowReached, Stagnation
+from ga4stpg.customevol import GeneticEvolution as Evolution
+from ga4stpg.customevol import GeneticPopulation as Population
+from ga4stpg.binary.mutate import flip_onebit
+from ga4stpg.normalization import normalize
+from ga4stpg.pickers import random_picker
+from ga4stpg.selector import roullete
+from ga4stpg.tracker import DataTracker
+from ga4stpg.util import STEIN_B, display, update_best, update_generation
+from ga4stpg.graph import Graph
+from ga4stpg.graph.reader import read_problem
+from ga4stpg.evaluation import Eval
 
 
 def simulation(simulation_name, params : dict, get_evol : callable):
 
-    STPG = read_problem("datasets", "ORLibrary", params["dataset"])
+    STPG = read_problem("data", "ORLibrary", params["dataset"])
     lenght = STPG.nro_nodes - STPG.nro_terminals
 
     tracker = DataTracker(params['runtrial'], target=os.path.join("outputdata", simulation_name, STPG.name))
@@ -112,4 +112,3 @@ if __name__ == "__main__":
         for i in range(30):
             PARAMS['runtrial'] = i + 1
             simulation("20200711_binary_uniformcrossover", PARAMS, get_evol=sim_binary_uniformcrossover)
-

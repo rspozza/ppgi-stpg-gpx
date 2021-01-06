@@ -4,7 +4,7 @@ from evol.exceptions import StopEvolution
 from ga4stpg.graph import Graph, SteinerTreeProblem
 from ga4stpg.graph.util import is_steiner_tree
 
-from .customevol import SteinerPopulation as Population
+from .customevol import GeneticPopulation as Population
 from .evaluation import Converter
 
 
