@@ -5,8 +5,6 @@ from ga4stpg.graph import Graph, SteinerTreeProblem
 from ga4stpg.graph.util import is_steiner_tree
 
 from .customevol import GeneticPopulation as Population
-from .evaluation import Converter
-
 
 class IterationLimit(Condition):
 
@@ -44,19 +42,30 @@ class BestKnownReached(Condition):
 
 class BestSteinerTreeReachead(Condition):
 
-    def __init__(self, global_optimum : int, STPG : SteinerTreeProblem ):
+    def __init__(self,
+                 global_optimum : int,
+                 STPG : SteinerTreeProblem,
+                 decoder=None):
         self.global_optimum = global_optimum
         self.STPG = STPG
-        self.converter = Converter(STPG)
+        if callable(decoder):
+            self.decoder = decoder
+            self.is_to_use_decoder_function = True
+        else:
+            self.is_to_use_decoder_function = False
 
     def __call__(self, population : Population):
+
         best_solution = population.documented_best
+
         if (best_solution is not None and best_solution.cost == self.global_optimum):
 
-            if not isinstance(best_solution.chromosome, Graph) :
-                best_solution = self.converter.binary2treegraph(best_solution)
+            if self.is_to_use_decoder_function :
+                steiner_tree = self.decoder(best_solution.chromosome)
+            else:
+                steiner_tree = best_solution.chromosome
 
-            result, _ = is_steiner_tree(best_solution.chromosome, self.STPG)
+            result, _ = is_steiner_tree(steiner_tree, self.STPG)
 
             if result :
                 raise StopEvolution("BestKnowReached")
