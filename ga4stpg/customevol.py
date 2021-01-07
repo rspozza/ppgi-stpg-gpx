@@ -9,7 +9,7 @@ from evol import Evolution, Individual
 from evol.conditions import Condition
 from evol.exceptions import StopEvolution
 from evol.population import BasePopulation
-from evol.population.base import Population
+from evol.population import Population
 from evol.step import EvolutionStep
 from evol.utils import select_arguments
 
