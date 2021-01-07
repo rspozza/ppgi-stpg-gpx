@@ -42,7 +42,7 @@ class BestKnownReached(Condition):
            raise StopEvolution("BestKnowReached")
 
 
-class BestSolutionKnowReached(Condition):
+class BestSteinerTreeReachead(Condition):
 
     def __init__(self, global_optimum : int, STPG : SteinerTreeProblem ):
         self.global_optimum = global_optimum

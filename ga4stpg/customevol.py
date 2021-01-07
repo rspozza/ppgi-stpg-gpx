@@ -9,80 +9,14 @@ from evol import Evolution, Individual
 from evol.conditions import Condition
 from evol.exceptions import StopEvolution
 from evol.population import BasePopulation
+from evol.population.base import Population
 from evol.step import EvolutionStep
 from evol.utils import select_arguments
 
 
-class SteinerIndividual(Individual):
-
-    def __init__(self, chromosome: Any, fitness: Optional[float] = None):
-        self.age = 0
-        self.last_improvement = 0
-        self.chromosome = chromosome
-        self._fitness = fitness
-        self._cost = fitness
-        self.is_normal = False
-        self.qtd_partitions = 0
-        self.id = f"{str(uuid4())[:6]}"
-
-    @property
-    def fitness(self):
-        return self._fitness
-
-    @fitness.setter
-    def fitness(self, value):
-        self._fitness = value
-        self.is_normal = True
-
-    @property
-    def cost(self):
-        return self._cost
-
-    @cost.setter
-    def cost(self, value):
-        self._cost = value
-        self._fitness = value
-        self.is_normal = False
-
-    @property
-    def is_connected(self):
-        '''If the graph represented by the chromosome has only one partition,
-        It means that it is connected.
-        '''
-        return self.qtd_partitions == 1
-
-    def evaluate(self, eval_function: Callable[..., float], lazy: bool = False):
-        """Evaluate the fitness of the individual.
-
-        :param eval_function: Function that reduces a chromosome to a fitness.
-        :param lazy: If True, do no re-evaluate the fitness if the fitness is known.
-        """
-        if self._cost is None or not lazy:
-            result = eval_function(self.chromosome)
-
-            if isinstance(result, tuple) and len(result) == 2:
-                self.cost, self.qtd_partitions = result
-            elif isinstance(result, (int, float)):
-                self.cost = result
-            else:
-                raise RuntimeError(f"Problem to understand the evaluation return {result}")
-
-
-class SelectStep(EvolutionStep):
-
-    def apply(self, population: 'SteinerPopulation') -> 'SteinerPopulation':
-        return population.select(**self.kwargs)
-
-
-class CrossoverStep(EvolutionStep):
-
-    def apply(self, population: 'SteinerPopulation') -> 'SteinerPopulation':
-        return population.crossover(**self.kwargs)
-
-
 class GeneticEvolution(Evolution):
 
-    def __copy__(self) -> 'SteinerEvolution':
+    def __copy__(self) :
         result = GeneticEvolution()
         result.chain = copy(self.chain)
         return result
@@ -231,7 +165,7 @@ class GeneticPopulation(BasePopulation):
             self.documented_best = copy(current_best)
             self.documented_best.last_improvement = self.generation
 
-    def evaluate(self, lazy: bool = False) -> 'Population':
+    def evaluate(self, lazy: bool = False) -> Population:
         """Evaluate the individuals in the population.
 
         This evaluates the fitness of all individuals. If lazy is True, the
@@ -291,5 +225,71 @@ class GeneticPopulation(BasePopulation):
 
         return self
 
-    def _update_population(self, new_population : 'SteinerPopulation'):
+    def _update_population(self, new_population):
         self.individuals = new_population
+
+class SteinerIndividual(Individual):
+
+    def __init__(self, chromosome: Any, fitness: Optional[float] = None):
+        self.age = 0
+        self.last_improvement = 0
+        self.chromosome = chromosome
+        self._fitness = fitness
+        self._cost = fitness
+        self.is_normal = False
+        self.qtd_partitions = 0
+        self.id = f"{str(uuid4())[:6]}"
+
+    @property
+    def fitness(self):
+        return self._fitness
+
+    @fitness.setter
+    def fitness(self, value):
+        self._fitness = value
+        self.is_normal = True
+
+    @property
+    def cost(self):
+        return self._cost
+
+    @cost.setter
+    def cost(self, value):
+        self._cost = value
+        self._fitness = value
+        self.is_normal = False
+
+    @property
+    def is_connected(self):
+        '''If the graph represented by the chromosome has only one partition,
+        It means that it is connected.
+        '''
+        return self.qtd_partitions == 1
+
+    def evaluate(self, eval_function: Callable[..., float], lazy: bool = False):
+        """Evaluate the fitness of the individual.
+
+        :param eval_function: Function that reduces a chromosome to a fitness.
+        :param lazy: If True, do no re-evaluate the fitness if the fitness is known.
+        """
+        if self._cost is None or not lazy:
+            result = eval_function(self.chromosome)
+
+            if isinstance(result, tuple) and len(result) == 2:
+                self.cost, self.qtd_partitions = result
+            elif isinstance(result, (int, float)):
+                self.cost = result
+            else:
+                raise RuntimeError(f"Problem to understand the evaluation return {result}")
+
+
+class SelectStep(EvolutionStep):
+
+    def apply(self, population: GeneticPopulation) -> GeneticPopulation:
+        return population.select(**self.kwargs)
+
+
+class CrossoverStep(EvolutionStep):
+
+    def apply(self, population: GeneticPopulation) -> GeneticPopulation:
+        return population.crossover(**self.kwargs)
