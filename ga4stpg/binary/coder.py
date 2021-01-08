@@ -1,17 +1,20 @@
-from evol import Individual
-
-from ga4stpg.customevol import SteinerIndividual
+'''
+Code : class
+    Enconde
+'''
 from ga4stpg.graph import Graph, SteinerTreeProblem
 from ga4stpg.graph.disjointsets import DisjointSets
 from ga4stpg.graph.priorityqueue import PriorityQueue
 
 class Coder:
-
+    '''Coder : class
+    '''
     def __init__(self, STPG : SteinerTreeProblem):
+        '''STPG hold the graph instance from the problem'''
         self.STPG = STPG
 
     def vertices_from_chromosome(self, chromosome):
-
+        '''Computes the steiner vertices from a binary chromosome'''
         nro_vertices = self.STPG.nro_nodes
         terminals = self.STPG.terminals
 
@@ -21,10 +24,9 @@ class Coder:
 
         return vertices
 
-    def treegraph2binary(self, individual : Individual):
-        '''Converts from TreeChromosome to a BinaryChromosome'''
+    def treegraph2binary(self, subgraph):
+        '''Encode a tree graph into a binary string'''
 
-        subgraph = individual.chromosome
         terminals = set(self.STPG.terminals)
         nro_vertices = self.STPG.nro_nodes
 
@@ -38,15 +40,12 @@ class Coder:
         # choosing only the non_terminals positions
         genes = (gene for node, gene in enumerate(genes, start=1) if node not in terminals)
 
-        return SteinerIndividual(''.join(genes))
+        return ''.join(genes)
 
-    def binary2treegraph(self, individual : Individual):
+    def binary2treegraph(self, chromosome):
         '''Converts from BinaryChromosome to TreeChromosome'''
 
         GRAPH = self.STPG.graph
-        terminals = self.STPG.terminals
-        nro_vertices = self.STPG.nro_nodes
-        chromosome = individual.chromosome
 
         queue = PriorityQueue()
         disjointset = DisjointSets()
@@ -75,4 +74,4 @@ class Coder:
                 subgraph.add_edge(v, u, weight=weight)
                 disjointset.union(v, u)
 
-        return SteinerIndividual(subgraph)
+        return subgraph

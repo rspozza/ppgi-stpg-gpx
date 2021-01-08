@@ -1,7 +1,7 @@
 
 from evol.conditions import Condition
 from evol.exceptions import StopEvolution
-from ga4stpg.graph import Graph, SteinerTreeProblem
+from ga4stpg.graph import SteinerTreeProblem
 from ga4stpg.graph.util import is_steiner_tree
 
 from .customevol import GeneticPopulation as Population
@@ -46,8 +46,10 @@ class BestSteinerTreeReachead(Condition):
                  global_optimum : int,
                  STPG : SteinerTreeProblem,
                  decoder=None):
+
         self.global_optimum = global_optimum
         self.STPG = STPG
+
         if callable(decoder):
             self.decoder = decoder
             self.is_to_use_decoder_function = True

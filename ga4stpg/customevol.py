@@ -39,7 +39,6 @@ class GeneticEvolution(Evolution):
 
 
 class GeneticPopulation(BasePopulation):
-
     """Population of Individuals
 
     :param chromosomes: Iterable of initial chromosomes of the Population.
