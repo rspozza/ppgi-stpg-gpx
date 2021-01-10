@@ -10,7 +10,7 @@ class TestMinimumSpanningTree(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
 
-        arquivo = path.join("data", "ORLibrary", "steinb1.txt")
+        arquivo = path.join("datasets", "ORLibrary", "steinb1.txt")
         reader = ReaderORLibrary()
         cls.stp = reader.parser(arquivo)
         cls.graph = cls.stp.graph

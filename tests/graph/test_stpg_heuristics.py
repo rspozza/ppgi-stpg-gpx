@@ -14,7 +14,7 @@ class TestSTPGHeuristicas(unittest.TestCase):
 
     def setUp(self):
         reader = ReaderORLibrary()
-        self.stpg_instance = reader.parser(path.join("data", "ORLibrary", "steinb13.txt"))
+        self.stpg_instance = reader.parser(path.join("datasets", "ORLibrary", "steinb13.txt"))
 
         self.graph = self.stpg_instance.graph
         self.terminals = list(self.stpg_instance.terminals)
