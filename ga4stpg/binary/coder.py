@@ -2,9 +2,12 @@
 Code : class
     Enconde
 '''
-from ga4stpg.graph import Graph, SteinerTreeProblem
+from ga4stpg.graph import SteinerTreeProblem
 from ga4stpg.graph.disjointsets import DisjointSets
+from ga4stpg.graph.graph import UndirectedGraph as UGraph
+from ga4stpg.graph.graph import UndirectedWeightedGraph as UWGraph
 from ga4stpg.graph.priorityqueue import PriorityQueue
+
 
 class Coder:
     '''Coder : class
@@ -49,7 +52,7 @@ class Coder:
 
         queue = PriorityQueue()
         disjointset = DisjointSets()
-        subgraph = Graph()
+        subgraph = UGraph()
         dones = set()
 
         # todos os vértices esperados na solução parcial
@@ -66,12 +69,12 @@ class Coder:
             for u in GRAPH.adjacent_to(v):
                 if (u in vertices) and (u not in dones):
                     weight = GRAPH.weight(v, u)
-                    queue.push(weight, (v, u, weight))
+                    queue.push(weight, (v, u))
 
         while queue:
-            v, u, weight = queue.pop()
+            v, u = queue.pop()
             if disjointset.find(v) != disjointset.find(u):
-                subgraph.add_edge(v, u, weight=weight)
+                subgraph.add_edge(v, u)
                 disjointset.union(v, u)
 
         return subgraph
