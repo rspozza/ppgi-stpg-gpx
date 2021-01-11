@@ -19,12 +19,12 @@ from ga4stpg.tracker import DataTracker
 from ga4stpg.util import STEIN_B, display, update_best, update_generation
 
 
-def simulation(simulation_name, para ms : dict, get_evol : callable):
+def simulation(simulation_name, params : dict, get_evol : callable):
 
     STPG = read_problem("datasets", "ORLibrary", params["dataset"])
     lenght = STPG.nro_nodes - STPG.nro_terminals
 
-    tracker = DataTracker(params['runtrial'], target=os.path.join("outputdata", simulation_name, STPG.name))
+    tracker = DataTracker(params['runtrial'], target=os.path.join("data", simulation_name, STPG.name))
 
     population = (Population(chromosomes=[ random_binary(lenght) for _ in range(params["population_size"]) ],
                             eval_function=EvaluateBinary(STPG),
@@ -35,8 +35,8 @@ def simulation(simulation_name, para ms : dict, get_evol : callable):
 
     evol = get_evol(STPG, tracker, params)
 
-    with Stagnation(interval=params["stagnation_interval"]), \
-        BestSteinerTreeReachead(global_optimum=params["global_optimum"],
+    # with Stagnation(interval=params["stagnation_interval"]), \
+    with BestSteinerTreeReachead(global_optimum=params["global_optimum"],
                                 STPG=STPG,
                                 decoder=Coder(STPG).binary2treegraph,
                                 ):
@@ -103,17 +103,17 @@ if __name__ == "__main__":
         'runtrial' : 0,
         'dataset' : 'steinb1.txt',
         'global_optimum'       : 82,
-        'population_size'     : 100,
+        'population_size'     : 50,
         'tx_mutation'         : 0.2,
         'n_iterations'        : 4_000,
         'stagnation_interval' : 500,
-        'pbcrossover' : 0.5
+        'pbcrossover' : 0.9
     }
 
-    for dataset, value in STEIN_B:
+    for dataset, value in STEIN_B[2:3]:
         print('='*10,'\n', dataset)
         PARAMS['dataset'] = dataset
         PARAMS['global_optimum'] = value
         for i in range(30):
             PARAMS['runtrial'] = i + 1
-            simulation("teste", PARAMS, get_evol=sim_binary_2pointcrossover)
+            simulation("teste", PARAMS, get_evol=sim_binary_1pointcrossover)
