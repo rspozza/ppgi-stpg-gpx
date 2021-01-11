@@ -159,7 +159,7 @@ class GeneticPopulation(BasePopulation):
         """Update the documented best"""
         current_best = self.current_best
         documented_best = self.documented_best
-        if (    self.documented_best is None
+        if (self.documented_best is None
             or (documented_best.cost > current_best.cost)):
             self.documented_best = copy(current_best)
             self.documented_best.last_improvement = self.generation
@@ -190,9 +190,8 @@ class GeneticPopulation(BasePopulation):
     def select(self,
                selection_func : Callable,
                **kwargs) -> 'Population':
-        selected  = selection_func(self.individuals, **kwargs)
 
-        self.individuals = selected
+        self.individuals  = selection_func(self.individuals, **kwargs)
 
         return self
 
@@ -226,6 +225,7 @@ class GeneticPopulation(BasePopulation):
 
     def _update_population(self, new_population):
         self.individuals = new_population
+
 
 class SteinerIndividual(Individual):
 
