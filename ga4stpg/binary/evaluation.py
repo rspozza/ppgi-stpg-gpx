@@ -10,7 +10,7 @@ class EvaluateBinary:
         if callable(penality_function):
             self.penality_function = penality_function
         else:
-            self.penality_function = lambda k : (k - 1) * 100
+            self.penality_function = lambda k : (k - 1) * 1_000
 
 
     def vertices_from_chromosome(self, chromosome):
@@ -22,13 +22,12 @@ class EvaluateBinary:
 
         non_terminals = (v for v in range(1, nro_vertices+1) if v not in terminals)
 
-        vertices = set(v for v, g in zip(non_terminals, chromosome) if int(g))
-
-        vertices.union(terminals)
+        vertices = set(v for v, g in zip(non_terminals, chromosome) if int(g)).union(terminals)
 
         return vertices
 
     def __call__(self, chromosome, **kwargs):
+
         GRAPH = self.STPG.graph
         terminals = self.STPG.terminals
         nro_vertices = self.STPG.nro_nodes
