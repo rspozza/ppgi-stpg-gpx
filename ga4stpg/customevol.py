@@ -1,8 +1,7 @@
 
 import time
 from copy import copy
-from random import choices
-from typing import Any, Callable, Generator, Iterable, List, Optional, Sequence, Union
+from typing import Any, Callable, Generator, Iterable, Optional, Sequence
 from uuid import uuid4
 
 from evol import Evolution, Individual
@@ -11,7 +10,7 @@ from evol.exceptions import StopEvolution
 from evol.population import BasePopulation
 from evol.population import Population
 from evol.step import EvolutionStep
-from evol.utils import select_arguments
+# from evol.utils import select_arguments
 
 
 class GeneticEvolution(Evolution):
@@ -117,7 +116,8 @@ class GeneticPopulation(BasePopulation):
             Arguments are only passed to the functions if they accept them.
         :return: self
         """
-        # raise RuntimeWarning("offspring_generator instanciate with a Individual not a SteinerIndividual")
+        # raise RuntimeWarning(
+        #       "offspring_generator instanciate with a Individual not a SteinerIndividual")
         # if population_size:
         #     self.intended_size = population_size
         # offspring = offspring_generator(parents=self.individuals,
@@ -178,7 +178,8 @@ class GeneticPopulation(BasePopulation):
         """
         if self.pool:
             f = self.eval_function  # We cannot refer to self in the map
-            scores = self.pool.map(lambda i: i.fitness if (i.fitness and lazy) else f(i.chromosome), self.individuals)
+            scores = self.pool.map(lambda i: i.fitness if (i.fitness and lazy) else f(i.chromosome),
+                                    self.individuals)
             for individual, fitness in zip(self.individuals, scores):
                 individual.fitness = fitness
         else:
@@ -230,9 +231,9 @@ class GeneticPopulation(BasePopulation):
 class SteinerIndividual(Individual):
 
     def __init__(self, chromosome: Any, fitness: Optional[float] = None):
+        super().__init__(chromosome=chromosome)
         self.age = 0
         self.last_improvement = 0
-        self.chromosome = chromosome
         self._fitness = fitness
         self._cost = fitness
         self.is_normal = False
