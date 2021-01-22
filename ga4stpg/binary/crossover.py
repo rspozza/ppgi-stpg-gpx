@@ -1,6 +1,6 @@
 from random import sample, choice, random
 
-def cx2_points(parent_a, parent_b):
+def cx2_points(parent_a, parent_b, **kwargs):
     length_a, length_b = len(parent_a), len(parent_b)
     assert length_a == length_b, "chromosomes doesn't have the same length"
     assert length_a > 0, "chromosome must have length greater than 0"
@@ -10,13 +10,13 @@ def cx2_points(parent_a, parent_b):
 
     return (parent_a[:p1] + parent_b[p1:p2] + parent_a[p2:])
 
-def cx1_point(parent_a, parent_b):
+def cx1_point(parent_a, parent_b, **kwargs):
     length_a, length_b = len(parent_a), len(parent_b)
     assert length_a == length_b, "chromosomes doesn't have the same length"
     index = choice(range(0, length_a))
     return (parent_a[:index] + parent_b[index:])
 
-def n_points(parent_a, parent_b, n=2):
+def n_points(parent_a, parent_b, n=2, **kwargs):
 
     length_a, length_b = len(parent_a), len(parent_b)
     assert length_a == length_b, "chromosomes doesn't have the same length"

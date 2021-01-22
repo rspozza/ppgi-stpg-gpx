@@ -1,8 +1,8 @@
 
 import time
 from copy import copy
-from random import choices
-from typing import Any, Callable, Generator, Iterable, List, Optional, Sequence, Union
+from random import choices, random, sample
+from typing import Any, Callable, Generator, Iterable, Iterator, List, Optional, Sequence, Union
 from uuid import uuid4
 
 from evol import Evolution, Individual
@@ -80,6 +80,7 @@ class GeneticPopulation(BasePopulation):
         self.intended_size = intended_size or len(self.individuals)
         self.stoppedby = None
         self.runtime = 0.0
+        self.selected_individuals = None
 
     def __copy__(self):
         result = self.__class__(chromosomes=[],
@@ -191,35 +192,43 @@ class GeneticPopulation(BasePopulation):
                selection_func : Callable,
                **kwargs) -> 'Population':
 
-        self.individuals  = selection_func(self.individuals, **kwargs)
+        self.selected_individuals  = selection_func(self.individuals, **kwargs)
 
         return self
 
     def crossover(self,
-              combiner : Callable,
-              parent_picker : Callable,
-              population_size: Optional[int] = None,
-              **kwargs) -> 'Population':
+                    combiner : Callable,
+                    n_parents: Optional[int] = 2,
+                    intended_size : Optional[int] = None,
+                    **kwargs
+                    ):
+        if self.selected_individuals is None:
+            raise RuntimeError("select individuals first")
 
-        if not population_size:
-            population_size = self.intended_size
+        if not intended_size:
+            intended_size = self.intended_size or len(self.individuals)
 
-        pick = parent_picker(self.individuals)
-        newpopulation = list()
+        count = 0
+        new_population = list()
 
-        while len(newpopulation) < population_size:
+        while count < intended_size:
 
-            parents = [individual.chromosome for individual in next(pick) ]
+            try:
+                parents = sample(self.selected_individuals, k=n_parents)
+            except ValueError as error:
+                raise error
 
-            combined = combiner(*parents, **kwargs)
+            offspring = combiner(*(p.chromosome for p in parents), **kwargs)
 
-            if isinstance(combined, Generator):
-                for child in combined:
-                    newpopulation.append(SteinerIndividual(chromosome=child))
+            if isinstance(offspring, (Generator, list, tuple)):
+                for chromosome in offspring:
+                    new_population.append(SteinerIndividual(chromosome=chromosome))
+                    count += 1
             else:
-                newpopulation.append(SteinerIndividual(chromosome=combined))
+                new_population.append(SteinerIndividual(chromosome=offspring))
+                count += 1
 
-        self._update_population(newpopulation)
+        self._update_population(new_population)
 
         return self
 
