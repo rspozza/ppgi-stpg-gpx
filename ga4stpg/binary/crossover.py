@@ -1,5 +1,19 @@
 from random import sample, choice, random
 
+def pb_cx2_points(parent_a, parent_b, probability=1, **kwargs):
+    if random() < probability:
+        yield from cx2_points(parent_a, parent_b)
+    else:
+        yield parent_a
+        yield parent_b
+
+def pb_cx1_point(parent_a, parent_b, probability=1, **kwargs):
+    if random() < probability:
+        yield from cx1_point(parent_a, parent_b)
+    else:
+        yield parent_a
+        yield parent_b
+
 def cx2_points(parent_a, parent_b, **kwargs):
     length_a, length_b = len(parent_a), len(parent_b)
     assert length_a == length_b, "chromosomes doesn't have the same length"
@@ -8,13 +22,16 @@ def cx2_points(parent_a, parent_b, **kwargs):
     points.sort()
     p1, p2 = points
 
-    return (parent_a[:p1] + parent_b[p1:p2] + parent_a[p2:])
+    yield parent_a[:p1] + parent_b[p1:p2] + parent_a[p2:]
+    yield parent_b[:p1] + parent_a[p1:p2] + parent_b[p2:]
 
 def cx1_point(parent_a, parent_b, **kwargs):
     length_a, length_b = len(parent_a), len(parent_b)
     assert length_a == length_b, "chromosomes doesn't have the same length"
     index = choice(range(0, length_a))
-    return (parent_a[:index] + parent_b[index:])
+
+    yield parent_a[:index] + parent_b[index:]
+    yield parent_b[:index] + parent_a[index:]
 
 def n_points(parent_a, parent_b, n=2, **kwargs):
 
