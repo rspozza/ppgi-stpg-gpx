@@ -70,4 +70,4 @@ class BestSteinerTreeReachead(Condition):
             result, _ = is_steiner_tree(steiner_tree, self.STPG)
 
             if result :
-                raise StopEvolution("BestKnowReached")
+                raise StopEvolution("BestKnownSteinerTreeReached")
