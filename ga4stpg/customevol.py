@@ -23,7 +23,6 @@ class GeneticEvolution(Evolution):
 
     def select(self,
                selection_func: Callable,
-               lazy: bool = False,
                name: Optional[str] = 'selection',
                **kwargs) -> 'Evolution':
 
@@ -31,7 +30,6 @@ class GeneticEvolution(Evolution):
 
     def crossover(self,
                   combiner: Callable,
-                  population_size: Optional[int] = None,
                   name: Optional[str] = 'crossover',
                   **kwargs) -> 'Evolution':
 
@@ -233,6 +231,7 @@ class GeneticPopulation(BasePopulation):
         return self
 
     def _update_population(self, new_population):
+        assert len(new_population) == self.intended_size, "new populations has not the intended size"
         self.individuals = new_population
 
 
