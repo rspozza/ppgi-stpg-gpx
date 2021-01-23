@@ -106,5 +106,5 @@ venv.bak/
 #
 .vscode
 
-outputs/*
+data/*
 logs/*
