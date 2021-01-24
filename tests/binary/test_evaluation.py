@@ -2,9 +2,9 @@ import unittest
 from os import path
 
 from ga4stpg.binary.coder import Coder
-from ga4stpg.binary.evaluation import EvaluateBinary
+from ga4stpg.binary.evaluation import EvaluateKruskalBased
 from ga4stpg.graph import ReaderORLibrary
-from ga4stpg.graph.algorithms import prim
+from ga4stpg.graph.algorithms import prim, kruskal
 from ga4stpg.graph.graph import UndirectedGraph as UGraph
 from ga4stpg.graph.disjointsets import DisjointSets
 
@@ -14,11 +14,11 @@ class TestEvaluateBinary(unittest.TestCase):
         filename = path.join('datasets', 'ORLibrary', 'steinb11.txt')
         self.stpg  = ReaderORLibrary().parser(filename)
 
-    def test_basicEvaluateBinaryProperties(self):
+    def test_basicEvaluateKruskalBasedProperties(self):
 
-        evaluator = EvaluateBinary(self.stpg)
+        evaluator = EvaluateKruskalBased(self.stpg)
 
-        self.assertIsInstance(evaluator, EvaluateBinary)
+        self.assertIsInstance(evaluator, EvaluateKruskalBased)
         self.assertTrue(callable(evaluator))
         self.assertTrue(hasattr(evaluator, 'vertices_from_chromosome'))
 
@@ -31,7 +31,7 @@ class TestEvaluateBinary(unittest.TestCase):
         stpg = self.stpg
         graph_vertices = set(self.stpg.graph.vertices)
 
-        evaluator = EvaluateBinary(self.stpg)
+        evaluator = EvaluateKruskalBased(self.stpg)
         expected_lenght = stpg.nro_nodes - stpg.nro_terminals
         chromosome = '1' * expected_lenght
 
@@ -39,29 +39,45 @@ class TestEvaluateBinary(unittest.TestCase):
 
         self.assertEqual(graph_vertices, evaluator_vertices)
 
-
-    def test_EvaluateMST(self):
+    def test_compare_with_prim(self):
         stpg  = self.stpg
         graph = self.stpg.graph
 
         expected_lenght = stpg.nro_nodes - stpg.nro_terminals
         chromosome = '1' * expected_lenght
 
-        subtree = Coder(stpg).binary2treegraph(chromosome)
-
-
-        evaluator = EvaluateBinary(stpg)
+        evaluator = EvaluateKruskalBased(stpg)
 
         evaluator_cost, qtd_partitions = evaluator(chromosome)
 
         dict_tree, prim_cost = prim(graph,1)
 
-
-        self.assertIsInstance(subtree, UGraph)
         self.assertIsInstance(dict_tree, dict)
         self.assertIsInstance(qtd_partitions, int)
         self.assertEqual(qtd_partitions, 1)
         self.assertEqual(evaluator_cost, prim_cost)
+
+    def test_compare_with_kruskal(self):
+        stpg  = self.stpg
+        graph = self.stpg.graph
+
+        mst_kruskal = kruskal(graph=graph)
+
+        expected_lenght = stpg.nro_nodes - stpg.nro_terminals
+        chromosome = '1' * expected_lenght
+
+        evaluator = EvaluateKruskalBased(stpg)
+        evaluator_cost, qtd_partitions = evaluator(chromosome)
+
+        mst_cost = 0
+        for v, u in mst_kruskal.gen_undirect_edges():
+            mst_cost += mst_kruskal.weight(v, u)
+
+        self.assertIsInstance(qtd_partitions, int)
+        self.assertEqual(qtd_partitions, 1)
+
+        self.assertEqual(evaluator_cost, mst_cost)
+
 
     def test_EvaluateZeroChromossome(self):
         stpg  = self.stpg
@@ -87,7 +103,7 @@ class TestEvaluateBinary(unittest.TestCase):
         expected_lenght = stpg.nro_nodes - stpg.nro_terminals
         chromosome = '0' * expected_lenght
 
-        evaluator = EvaluateBinary(stpg)
+        evaluator = EvaluateKruskalBased(stpg)
 
         evaluator_cost, qtd_partitions = evaluator(chromosome)
 
