@@ -78,6 +78,93 @@ class TestEvaluateBinary(unittest.TestCase):
 
         self.assertEqual(evaluator_cost, mst_cost)
 
+    def test_vertices_from_chromossome_random_chromosome(self):
+        filename = path.join('datasets', 'test', 'test1.txt')
+        stpg  = ReaderORLibrary().parser(filename)
+
+        self.assertIsNotNone(stpg)
+        self.assertEqual(stpg.nro_nodes, 7)
+        self.assertEqual(stpg.nro_edges, 11)
+        self.assertEqual(stpg.nro_terminals, 2)
+        self.assertEqual(stpg.terminals, set([1, 5]))
+
+        evaluator = EvaluateKruskalBased(stpg)
+
+        chromosome = '11110'
+        vertices_from = evaluator.vertices_from_chromosome(chromosome)
+        expected_vertices = set([1, 2, 3, 4, 5, 6])
+        self.assertEqual(vertices_from, expected_vertices)
+
+        chromosome = '11111'
+        vertices_from = evaluator.vertices_from_chromosome(chromosome)
+        expected_vertices = set([1, 2, 3, 4, 5, 6, 7])
+        self.assertEqual(vertices_from, expected_vertices)
+
+
+        chromosome = '10101'
+        vertices_from = evaluator.vertices_from_chromosome(chromosome)
+        expected_vertices = set([1, 5, 2, 4, 7])
+        self.assertEqual(vertices_from, expected_vertices)
+
+    def test_decoder_random_chromosome(self):
+        filename = path.join('datasets', 'test', 'test1.txt')
+        stpg  = ReaderORLibrary().parser(filename)
+
+        evaluator = EvaluateKruskalBased(stpg)
+
+        chromosome = '11110'
+        vertices_from = evaluator.vertices_from_chromosome(chromosome)
+        expected_vertices = set([1, 2, 3, 4, 5, 6])
+        self.assertEqual(vertices_from, expected_vertices)
+
+        coder = Coder(stpg)
+        subgraph = coder.binary2treegraph(chromosome)
+
+        for v, u in subgraph.gen_undirect_edges():
+            self.assertTrue(stpg.graph.has_edge(v, u))
+
+        self.assertFalse(subgraph.has_edge(1, 2))
+        self.assertFalse(subgraph.has_edge(6, 4))
+
+        self.assertTrue(subgraph.has_edge(1, 3))
+        self.assertTrue(subgraph.has_edge(3, 2))
+        self.assertTrue(subgraph.has_edge(5, 4))
+        self.assertTrue(subgraph.has_edge(6, 5))
+        self.assertTrue(subgraph.has_edge(2, 5))
+
+        self.assertFalse(subgraph.has_node(7))
+        #não existe mesmo
+        self.assertFalse(subgraph.has_edge(7, 1))
+        self.assertFalse(subgraph.has_edge(7, 5))
+        self.assertFalse(subgraph.has_edge(3, 4))
+
+        # não existe no subgrafo
+        self.assertFalse(subgraph.has_edge(7, 2))
+        self.assertFalse(subgraph.has_edge(7, 3))
+        self.assertFalse(subgraph.has_edge(7, 4))
+        self.assertFalse(subgraph.has_edge(7, 6))
+
+    def test_evaluate_test1(self):
+        filename = path.join('datasets', 'test', 'test1.txt')
+        stpg  = ReaderORLibrary().parser(filename)
+
+        evaluator = EvaluateKruskalBased(stpg)
+        chromosome = '11110'
+        evaluator_cost, qtd_partitions = evaluator(chromosome)
+
+        self.assertEqual(qtd_partitions, 1)
+        self.assertEqual(evaluator_cost, 33)
+
+    def test_evaluate_test2(self):
+        filename = path.join('datasets', 'test', 'test2.txt')
+        stpg  = ReaderORLibrary().parser(filename)
+
+        evaluator = EvaluateKruskalBased(stpg)
+        chromosome = '11110'
+        evaluator_cost, qtd_partitions = evaluator(chromosome)
+
+        self.assertEqual(qtd_partitions, 2)
+        self.assertEqual(evaluator_cost, 1021)
 
     def test_EvaluateZeroChromossome(self):
         stpg  = self.stpg
@@ -110,9 +197,6 @@ class TestEvaluateBinary(unittest.TestCase):
         self.assertEqual(evaluator_cost, ((qtd_partitions - 1) * 1_000) + edges_sum)
         self.assertEqual(evaluator_cost, ((qtd_disjoint_sets - 1) * 1_000) + edges_sum)
         self.assertEqual(qtd_partitions, qtd_disjoint_sets)
-
-
-
 
 if __name__ == "__main__" :
     unittest.main()
