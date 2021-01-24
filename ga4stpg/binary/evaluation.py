@@ -2,7 +2,7 @@ from ga4stpg.graph.disjointsets import DisjointSets
 from ga4stpg.graph.priorityqueue import PriorityQueue
 from ga4stpg.graph.reader import SteinerTreeProblem
 
-class EvaluateBinary:
+class EvaluateKruskalBased:
 
     def __init__(self, stpg : SteinerTreeProblem, penality_function=None) :
         self.STPG = stpg
@@ -29,8 +29,6 @@ class EvaluateBinary:
     def __call__(self, chromosome, **kwargs):
 
         GRAPH = self.STPG.graph
-        terminals = self.STPG.terminals
-        nro_vertices = self.STPG.nro_nodes
 
         penality = self.penality_function
 
