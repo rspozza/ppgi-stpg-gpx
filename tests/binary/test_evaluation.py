@@ -7,6 +7,7 @@ from ga4stpg.graph import ReaderORLibrary
 from ga4stpg.graph.algorithms import prim, kruskal
 from ga4stpg.graph.graph import UndirectedGraph as UGraph
 from ga4stpg.graph.disjointsets import DisjointSets
+from ga4stpg.graph.util import is_steiner_tree
 
 class TestEvaluateBinary(unittest.TestCase):
 
@@ -165,6 +166,40 @@ class TestEvaluateBinary(unittest.TestCase):
 
         self.assertEqual(qtd_partitions, 2)
         self.assertEqual(evaluator_cost, 1021)
+
+    def test_evaluate_steinb1(self):
+        filename = path.join('datasets', 'ORLibrary', 'steinb1.txt')
+
+        stpg  = ReaderORLibrary().parser(filename)
+        evaluator = EvaluateKruskalBased(stpg, penality_function=lambda k : (k-1) * 100)
+
+        chromosomes =[
+            ("00000010000000001011000110001100010100010", 82),
+            ("00011100101110110011011111001110111000111", 362),
+            ("11111111001011010111100110001101111110011", 209),
+            ("10011010001011001111111111101101110111011", 166),
+            ("10000010000000001011000111001100010101011", 100),
+            ("00000010000010011011000111001100010101010", 97),
+            ("00000010001000000011000111001100010001010", 95),
+            ("00000010000011001011000111001100010100010", 92)
+        ]
+
+        for chromosome, expected_value in chromosomes:
+            evaluator_cost, _ = evaluator(chromosome)
+            self.assertEqual(expected_value, evaluator_cost)
+
+    def test_best_solution_is_steiner_tree(self):
+        filename = path.join('datasets', 'ORLibrary', 'steinb1.txt')
+        stpg  = ReaderORLibrary().parser(filename)
+        coder = Coder(stpg)
+        chromosome = "00000010000000001011000110001100010100010"
+
+        subgraph = coder.binary2treegraph(chromosome)
+
+        result, _ = is_steiner_tree(subgraph, stpg)
+
+        self.assertTrue(result)
+
 
     def test_EvaluateZeroChromossome(self):
         stpg  = self.stpg
