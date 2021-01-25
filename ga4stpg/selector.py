@@ -12,7 +12,7 @@ def roullete(individuals, n_parents=None):
     if not n_parents:
         n_parents = len(individuals)
 
-    fitnesses = [p.fitness for p in individuals]
+    fitnesses = [p.fitness for p in individuals if p.is_normal ]
 
     return choices(individuals, weights=fitnesses, k=n_parents)
 
