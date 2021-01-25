@@ -35,6 +35,13 @@ class GeneticEvolution(Evolution):
 
         return self._add_step(CrossoverStep(name=name, combiner=combiner, **kwargs))
 
+    def normalize(self,
+                 norm_function: Callable,
+                 name: Optional[str] = 'normalization',
+                 **kwargs) -> 'Evolution' :
+
+        return self._add_step(NormalizationStep(name=name, norm_function=norm_function, **kwargs))
+
 
 class GeneticPopulation(BasePopulation):
     """Population of Individuals
@@ -154,12 +161,13 @@ class GeneticPopulation(BasePopulation):
         # altought you deserve everthing bad that to you
         return result
 
+    #def _update_documented_best(self):
     def _update_documented_best(self):
         """Update the documented best"""
         current_best = self.current_best
-        documented_best = self.documented_best
+
         if (self.documented_best is None
-            or (documented_best.cost > current_best.cost)):
+            or (current_best.cost < self.documented_best.cost)):
             self.documented_best = copy(current_best)
             self.documented_best.last_improvement = self.generation
 
@@ -175,15 +183,9 @@ class GeneticPopulation(BasePopulation):
         :param lazy: If True, do no re-evaluate the fitness if the fitness is known.
         :return: self
         """
-        if self.pool:
-            f = self.eval_function  # We cannot refer to self in the map
-            scores = self.pool.map(lambda i: i.fitness if (i.fitness and lazy) else f(i.chromosome), self.individuals)
-            for individual, fitness in zip(self.individuals, scores):
-                individual.fitness = fitness
-        else:
-            for individual in self.individuals:
-                individual.evaluate(eval_function=self.eval_function, lazy=lazy)
-        #### self._update_documented_best()
+        for individual in self.individuals:
+            individual.evaluate(eval_function=self.eval_function, lazy=False)
+
         return self
 
     def select(self,
@@ -216,7 +218,7 @@ class GeneticPopulation(BasePopulation):
             except ValueError as error:
                 raise error
 
-            offspring = combiner(*(p.chromosome for p in parents), **kwargs)
+            offspring = combiner(*[p.chromosome for p in parents], **kwargs)
 
             if isinstance(offspring, (Generator, list, tuple)):
                 for chromosome in offspring:
@@ -230,22 +232,62 @@ class GeneticPopulation(BasePopulation):
 
         return self
 
+    def normalize(self,
+                  norm_function : Callable):
+
+        self.individuals = norm_function(self.individuals)
+
+        return self
+
     def _update_population(self, new_population):
         assert len(new_population) == self.intended_size, "new populations has not the intended size"
         self.individuals = new_population
 
+    def callback(self,
+                 callback_function: Callable[..., None],
+                 **kwargs) -> 'BasePopulation':
+        """
+        Performs a callback function on the population.
+        Can be used for custom logging/checkpointing.
+        :param callback_function: Function that accepts the population
+        as a first argument.
+        :return:
+        """
+        callback_function(self, **kwargs)
+        return self
 
-class SteinerIndividual(Individual):
 
-    def __init__(self, chromosome: Any, fitness: Optional[float] = None):
+class SteinerIndividual:
+
+    def __init__(self, chromosome: Any, cost: Optional[float] = None):
+        self.id = f"{str(uuid4())[:6]}"
+
         self.age = 0
         self.last_improvement = 0
         self.chromosome = chromosome
-        self._fitness = fitness
-        self._cost = fitness
-        self.is_normal = False
-        self.qtd_partitions = 0
-        self.id = f"{str(uuid4())[:6]}"
+
+        self._cost = cost
+        self._fitness = None
+        self.qtd_partitions = None
+
+    def __copy__(self):
+        result = self.__class__(self.chromosome, cost=self.cost)
+
+        result.id = self.id
+        result.age = self.age
+        result.last_improvement = self.last_improvement
+        result.qtd_partitions = self.qtd_partitions
+        result.fitness = self.fitness
+
+        return result
+
+    @property
+    def is_normal(self):
+        return not self._fitness is None
+
+    @property
+    def is_evaluated(self):
+        return not self._cost is None
 
     @property
     def fitness(self):
@@ -254,7 +296,6 @@ class SteinerIndividual(Individual):
     @fitness.setter
     def fitness(self, value):
         self._fitness = value
-        self.is_normal = True
 
     @property
     def cost(self):
@@ -263,14 +304,16 @@ class SteinerIndividual(Individual):
     @cost.setter
     def cost(self, value):
         self._cost = value
-        self._fitness = value
-        self.is_normal = False
+        self._fitness = None
 
     @property
     def is_connected(self):
         '''If the graph represented by the chromosome has only one partition,
         It means that it is connected.
         '''
+        if self.qtd_partitions is None:
+            RuntimeError('nro of components is unknow')
+
         return self.qtd_partitions == 1
 
     def evaluate(self, eval_function: Callable[..., float], lazy: bool = False):
@@ -279,6 +322,7 @@ class SteinerIndividual(Individual):
         :param eval_function: Function that reduces a chromosome to a fitness.
         :param lazy: If True, do no re-evaluate the fitness if the fitness is known.
         """
+        # print(self.id, self.age, self.cost, self.is_evaluated)
         if self._cost is None or not lazy:
             result = eval_function(self.chromosome)
 
@@ -288,6 +332,25 @@ class SteinerIndividual(Individual):
                 self.cost = result
             else:
                 raise RuntimeError(f"Problem to understand the evaluation return {result}")
+
+            # print(self.id, self.age, self.cost, self.is_evaluated)
+
+
+    def mutate(self,
+                mutate_function: Callable[..., Any],
+                probability: float = 1.0,
+                **kwargs):
+        """Mutate the chromosome of the individual.
+
+        :param mutate_function: Function that accepts a chromosome and returns a mutated chromosome.
+        :param probability: Probability that the individual mutates.
+            The function is only applied in the given fraction of cases.
+            Defaults to 1.0.
+        :param kwargs: Arguments to pass to the mutation function.
+        """
+        if probability == 1.0 or random() < probability:
+            self.chromosome = mutate_function(self.chromosome, **kwargs)
+            self.cost = None
 
 
 class SelectStep(EvolutionStep):
@@ -300,3 +363,9 @@ class CrossoverStep(EvolutionStep):
 
     def apply(self, population: GeneticPopulation) -> GeneticPopulation:
         return population.crossover(**self.kwargs)
+
+
+class NormalizationStep(EvolutionStep):
+
+    def apply(self, population: BasePopulation) -> BasePopulation:
+        return population.normalize(**self.kwargs)
