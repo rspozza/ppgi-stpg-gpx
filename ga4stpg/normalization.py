@@ -1,6 +1,10 @@
+from operator import attrgetter
 
-def normalize(population):
+def normalize(individuals, key=attrgetter('cost')):
 
-    max_cost = max(p.cost for p in population)
-    for p in population:
-        p.fitness = max_cost - p.cost
+    major_individual = max(individuals, key=key)
+
+    for individual in individuals:
+        individual.fitness = major_individual.cost - individual.cost
+
+    return individuals
