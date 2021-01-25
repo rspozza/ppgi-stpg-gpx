@@ -25,7 +25,7 @@ STEIN_B = [
 
 def display(population):
     size = len(population)
-    msg = f"Population {population.id} | size {size} | generation {population.generation}"
+    msg = f"Population {population.id} | size {size} | generation {population.generation} | best cost {population.documented_best.cost}"
     print(msg)
 
 def update_best(population):
